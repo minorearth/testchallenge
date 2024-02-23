@@ -1,8 +1,10 @@
 import React from "react";
 import { RangeManager } from "./rangemanager";
+import { useEffect, useState } from "react";
+import { DataGrid, GridRowsProp, GridColDef } from "@mui/x-data-grid";
+import { UnitsManager } from "./unitsManager";
 
 function combineArrays(array_of_arrays) {
-  // console.log(array_of_arrays);
   let odometer = new Array(array_of_arrays.length);
   odometer.fill(0);
   let output = [];
@@ -12,8 +14,8 @@ function combineArrays(array_of_arrays) {
     newCombination = formCombination(odometer, array_of_arrays);
     output.push(newCombination);
   }
-  for (let k in output){
-    output[k]['id']=Number(k)+1
+  for (let k in output) {
+    output[k]["id"] = Number(k) + 1;
   }
   return output;
 }
@@ -24,9 +26,10 @@ function formCombination(odometer, array_of_arrays) {
     odometer_value,
     odometer_index
   ) {
-    let b="col"+odometer_index
-    accumulator[b]=array_of_arrays[odometer_index][odometer_value]
-    return accumulator;  },
+    let b = "prop" + odometer_index;
+    accumulator[b] = array_of_arrays[odometer_index][odometer_value];
+    return accumulator;
+  },
   {});
 }
 
@@ -53,39 +56,94 @@ function odometer_increment(odometer, array_of_arrays) {
 
 const collectArrays = (props) => {
   // return [[1,2,3],[4,5,6],[4,5,6]]
-  return props
-    .filter((item) => item.range != "undefined" && item.range)
-    .map((item) => [...item.range]);
+  return Object.keys(props)
+    .filter((item) => props[item].range != "undefined" && props[item].range)
+    .map((item) => [...props[item].range]);
 };
 
-export const TaskProps = ({ setVariants,taskProfile, setTaskProfile,setRows }) => {
+const makeGridHeader = (taskProfile) => {
+  let cols = Object.keys(taskProfile.props)
+    // .filter((item) => taskProfile.props[item].type == "generator")
+    .map((item, id) => {
+      return {
+        field: item,
+        headerName: taskProfile.props[item].title,
+        width: 150,
+      };
+    });
+  return [...cols, { field: "answer", headerName: "Ответ", width: 150 }];
+};
 
-  
+const extractPropNames = (props) => {
+  return Object.keys(props);
+};
+
+const makeInput = (row, props, propNames) => {
+  let a = {};
+  propNames.forEach((item) => (a[props[item].name] = row[item]));
+  return a;
+};
+
+const fulfillWithAnswers = (pop, props, propNames, f) => {
+  return pop.map((item) => {
+    return { ...item, answer: f(makeInput(item, props, propNames), "Kb") };
+  });
+};
+
+export const TaskProps = ({ taskProfile, setTaskProfile }) => {
+  const [rows, setRows] = useState([]);
+  let columns = makeGridHeader(taskProfile);
+
   return (
     <>
-      {taskProfile.props.map(
-        item =>
-          {
-            // console.log(item)
-            return item.type == "generator" && 
+      <textarea
+        className="w-full h-60"
+        name="postContent"
+        rows={4}
+        cols={40}
+        defaultValue={taskProfile != undefined && taskProfile.task}
+      />
+      {Object.keys(taskProfile.props).map(
+        (item) =>
+          taskProfile.props[item].type == "generator" && (
             <RangeManager
-              item={item}
+              item={taskProfile.props[item]}
+              propName={item}
               taskProfile={taskProfile}
               setTaskProfile={setTaskProfile}
-            />}
+            />
           )
-    }
+      )}
+      {Object.keys(taskProfile.props).map(
+        (item) =>
+          taskProfile.props[item].type == "picklist" && (
+            <UnitsManager
+              item={taskProfile.props[item]}
+              propName={item}
+              taskProfile={taskProfile}
+              setTaskProfile={setTaskProfile}
+            />
+          )
+      )}
       <button
-        // onClick={() => {combineArrays([[1,2,3],[4,5,6],[4,5,6]])}}
         onClick={() => {
-          setRows(combineArrays(collectArrays(taskProfile.props)))
-          // setVariants(combineArrays(collectArrays(taskProfile.props)));
-          // setVariants("combineArrays(collectArrays(taskProfile.props))");
+          let pop = combineArrays(collectArrays(taskProfile.props));
+       
+          pop = fulfillWithAnswers(
+            pop,
+            taskProfile.props,
+            extractPropNames(taskProfile.props),
+            taskProfile.execution
+          );
+          setRows(pop);
         }}
         className="px-3 py-1.5 text-sm text-white duration-150 bg-indigo-600 rounded-lg hover:bg-indigo-500 active:bg-indigo-700"
       >
         Сгенерировать и проверить задачи
       </button>
+      <div style={{ height: 300, width: "100%" }}>
+        <DataGrid rows={rows} columns={columns} />
+      </div>
     </>
   );
 };
