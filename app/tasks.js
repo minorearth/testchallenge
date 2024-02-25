@@ -1,3 +1,5 @@
+
+// https://www.youtube.com/watch?v=mipb4N6ZzfM&ab_channel=Hasura
 function getBaseLog(base, y) {
   return Math.log(y) / Math.log(base);
 }

@@ -1,20 +1,21 @@
 "use client";
-import { useEffect, useState } from "react";
+import { BrowserRouter } from "react-router-dom";
+
+import MiniDrawer from "./miniDrawer";
 import { TaskProps } from "./components/taskprops";
-import {generator} from './tasks'
+import { Classes } from "./components/classes";
+import { Route, Routes, Link } from "react-router-dom";
 
 export default function Home() {
-  const [taskProfile, setTaskProfile] = useState();
-  const [tasksShown, setTasksShown] = useState();
-  useEffect(() => {
-    setTaskProfile(generator["taskEgeInf7type1"]);
-  }, []);
-
   return (
-    <>
-      {taskProfile != undefined && (
-        <TaskProps taskProfile={taskProfile} setTaskProfile={setTaskProfile} />
-      )}
-    </>
+    <BrowserRouter>
+      <>
+        <Routes>
+          <Route path="*" component={<TaskProps />} />
+          <Route path="generator" component={<TaskProps />} />
+        </Routes>
+        {/* <MiniDrawer /> */}
+      </>
+    </BrowserRouter>
   );
 }

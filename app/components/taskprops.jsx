@@ -3,6 +3,7 @@ import { RangeManager } from "./rangemanager";
 import { useEffect, useState } from "react";
 import { DataGrid, GridRowsProp, GridColDef } from "@mui/x-data-grid";
 import { UnitsManager } from "./unitsManager";
+import { generator } from "../tasks";
 
 function combineArrays(array_of_arrays) {
   let odometer = new Array(array_of_arrays.length);
@@ -90,10 +91,18 @@ const fulfillWithAnswers = (pop, props, propNames, f) => {
   });
 };
 
-export const TaskProps = ({ taskProfile, setTaskProfile }) => {
+export const TaskProps = () => {
   const [rows, setRows] = useState([]);
-  let columns = makeGridHeader(taskProfile);
+  const [columns, setCols] = useState([]);
 
+  const [taskProfile, setTaskProfile] = useState();
+  const [tasksShown, setTasksShown] = useState();
+  useEffect(() => {
+    setTaskProfile(generator["taskEgeInf7type1"]);
+  }, []);
+  if (taskProfile == undefined) {
+    return <p>Loading</p>;
+  }
   return (
     <>
       <textarea
@@ -128,13 +137,15 @@ export const TaskProps = ({ taskProfile, setTaskProfile }) => {
       <button
         onClick={() => {
           let pop = combineArrays(collectArrays(taskProfile.props));
-       
+
           pop = fulfillWithAnswers(
             pop,
             taskProfile.props,
             extractPropNames(taskProfile.props),
             taskProfile.execution
           );
+          setCols(makeGridHeader(taskProfile));
+
           setRows(pop);
         }}
         className="px-3 py-1.5 text-sm text-white duration-150 bg-indigo-600 rounded-lg hover:bg-indigo-500 active:bg-indigo-700"
