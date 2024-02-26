@@ -19,9 +19,12 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
-import { TaskProps } from "./components/taskprops";
-import { Classes } from "./components/classes";
+import { TaskProps } from "../components/taskprops";
+import { Classes } from "../components/classes";
 import { Route, Routes, Link } from "react-router-dom";
+import { NextLinkComposed } from '../components/Link';
+import { useRouter } from 'next/navigation'
+
 
 const drawerWidth = 240;
 
@@ -92,6 +95,8 @@ const Drawer = styled(MuiDrawer, {
 
 export default function MiniDrawer() {
   const theme = useTheme();
+  const {query}=useRouter()
+  console.log(query)
   const [open, setOpen] = React.useState(false);
 
   const handleDrawerOpen = () => {
@@ -161,7 +166,9 @@ export default function MiniDrawer() {
         <Divider />
         <List>
           {["All mail", "Trash", "Spam"].map((text, index) => (
-            <ListItem key={text} disablePadding sx={{ display: "block" }} component={Link} to="generator">
+            <ListItem key={text} disablePadding sx={{ display: "block" }} component={NextLinkComposed} to={{
+              pathname: '/minidrawer',
+            }}>
               <ListItemButton
                 sx={{
                   minHeight: 48,
@@ -186,10 +193,12 @@ export default function MiniDrawer() {
       </Drawer>
       <Box component="main" className="p-3 flex-grow">
         <DrawerHeader />
-        <Routes>
-          <Route path="*" component={<Classes/>}/>
-          <Route path="generator" component={<TaskProps/>}/>
-        </Routes>
+        <TaskProps/>
+  
+        {/* {query.nav=='123'&&<Classes/>}
+        {query.nav=='456'&&<TaskProps/>} */}
+          
+
       </Box>
     </div>
   );

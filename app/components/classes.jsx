@@ -39,7 +39,7 @@ const getCities = async (db) => {
   const citySnapshot = await getDocs(citiesCol);
   const cityList = citySnapshot.docs.map((doc) => doc.data());
   citySnapshot.forEach((doc) => {
-    console.log(doc.id, " => ", doc.data());
+    // console.log(doc.id, " => ", doc.data());
   });
   return cityList;
 };
