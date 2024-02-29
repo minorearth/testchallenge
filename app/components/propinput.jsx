@@ -2,7 +2,6 @@ import React from "react";
 import { useState, useEffect } from "react";
 
 const updateRange = (taskProfile, attName, value, propName) => {
-  // console.log(value);
   if (attName == "range") {
     if (!Array.isArray(value)) {
       taskProfile.props[propName][attName] = value.split(",");

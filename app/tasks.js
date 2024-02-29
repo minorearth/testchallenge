@@ -5,7 +5,6 @@ function getBaseLog(base, y) {
 }
 
 const convertAnswer = (value, unit) => {
-    // console.log(value,unit)
   switch (unit) {
     case "Битах":
       return value;
