@@ -26,10 +26,33 @@ const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
 
-export const getDataFromCollection = async (collectionName, setRows, buildRows) => {
+export const getDataFromCollection = async (
+  collectionName,
+  setRows,
+  dependentFilter
+) => {
+  if (dependentFilter.length==0){
+    setRows([])
+    return 
+  }
   const col = collection(db, collectionName);
-  const Snapshot = await getDocs(col);
-  setRows(buildRows(Snapshot));
+  let q
+  if (dependentFilter != "none") {
+    const ids=dependentFilter.map(item=>item.id)
+    q = query(col, where('extid', "in", ids))
+  } else {
+    q = query(col);  
+  }
+  const Snapshot = await getDocs(q);
+  let ret = [];
+  Snapshot.forEach((item) => {
+    {
+      const data = item.data();
+      ret = [...ret, { id: item.id, ...data }];
+    }
+  });
+
+  setRows(ret);
 };
 
 export const deleteAllDocsInCollection = async (collectionName) => {
@@ -54,6 +77,12 @@ export const deleteAllDocsInCollectionByIds = async (
   setLoaded((state) => !state);
 };
 
+const checkIfExistByFieldValue = async (collectionName, key, value) => {
+  const collectionRef = collection(db, collectionName);
+  const q = query(collectionRef, where(key, "==", value));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.length == 0;
+};
 export const addDocInCollectionByValue = async (
   collectionName,
   key,
@@ -62,21 +91,16 @@ export const addDocInCollectionByValue = async (
   setLoaded
 ) => {
   const collectionRef = collection(db, collectionName);
-  const q = query(collectionRef, where(key, "==", value));
-  const querySnapshot = await getDocs(q);
-  querySnapshot.docs.length == 0 && (await addDoc(collectionRef, data));
+  // const check = await checkIfExistByFieldValue(collectionName, key, value);
+  const check = true;
+  check && (await addDoc(collectionRef, data));
   setLoaded((state) => !state);
 };
 
-export const addDocInCollection = async (
-  collectionName,
-  field,
-  value,
-  setRows
-) => {
+export const addDocInCollection = async (collectionName, data, setRows) => {
   const collectionRef = collection(db, collectionName);
-  const doc = await addDoc(collectionRef, { [field]: value });
-  setRows((oldRows) => [{ id: doc.id, [field]: value }, ...oldRows]);
+  const doc = await addDoc(collectionRef, data);
+  setRows((oldRows) => [{ id: doc.id, ...data }, ...oldRows]);
 };
 
 export const updateDocInCollectionById = async (collectionName, id, data) => {

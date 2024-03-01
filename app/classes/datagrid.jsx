@@ -19,42 +19,74 @@ import {
   addDocInCollection,
 } from "./datamodel";
 
-const columns = [
-  { field: "id", headerName: "id", width: 270 },
-  { field: "classname", headerName: "Мои классы", editable: true, width: 130 },
-];
-
-const buildRows = (classes) => {
-  let ret = [];
-  classes.forEach((item) => {
-    {
-      const data = item.data();
-      ret = [...ret, { id: item.id, classname: data.classname }];
-    }
-  });
-  return ret;
+const makeEmptyDoc = (columns) => {
+  return columns
+    .filter((item) => item.field != "id")
+    .reduce((acc, item) => ({ ...acc, [item.field]: "Не указано" }), {});
 };
 
 function EditToolbar(props) {
-  const { setRows, setRowModesModel, rows } = props;
-  const handleClick = () => {
-    addDocInCollection("classes", "classname", "Не указан", setRows);
-  };
-
+  const { setRows, setRowModesModel, rows, addrow } = props;
   return (
     <GridToolbarContainer>
-      <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-        Add record
+      <Button color="primary" startIcon={<AddIcon />} onClick={addrow}>
+        Добавить
       </Button>
     </GridToolbarContainer>
   );
 }
 
-export function Classlist({ classes }) {
+export function Datagrid({
+  collection,
+  keyfield,
+  columns,
+  dependentFilter,
+  setFilters,
+  checkduplic
+}) {
+  const addrow = () => {
+    const data = makeEmptyDoc(columns);
+    addDocInCollection(collection, data, setRows);
+  };
+
+  const makeDataFromCSSLine = (line, columns) => {
+    const items = line.split(";");
+    let cols= columns
+      .filter((item) => item.field != "id")
+      .reduce(
+        (acc, item, id) => ({
+          ...acc,
+          [item["field"]]: items[id] == undefined ? "Не указано" : items[id],
+        }),
+        {}
+      );
+    
+      
+      return {...cols,extid: dependentFilter[0].id, keyfield: dependentFilter[0].keyfield}
+  };
+  
+
+  const makeDocsFromCSSLines = (lines) => {
+    lines.forEach((item) => {
+      const datas = makeDataFromCSSLine(item, columns);
+      addDocInCollectionByValue(
+        collection,
+        keyfield,
+        item.split(";")[0],
+        datas,
+        setLoaded
+      );
+    });
+
+    return columns
+      .filter((item) => item.field != "id")
+      .reduce((acc, item) => ({ ...acc, [item.field]: "Не указано" }), {});
+  };
+
   const processRowUpdate = (newRow) => {
     const updatedRow = { ...newRow, isNew: false };
     setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
-    updateDocInCollectionById("classes", newRow.id, newRow);
+    updateDocInCollectionById(collection, newRow.id, newRow);
     return updatedRow;
   };
 
@@ -64,42 +96,41 @@ export function Classlist({ classes }) {
 
   const [loaded, setLoaded] = useState(true);
 
-  const handleFileChange = async (e) => {
-    const fileUrl = URL.createObjectURL(e.target.files[0]);
+  const [rows, setRows] = useState([]);
+  useEffect(() => {
+    console.log('rerender',dependentFilter)
+    getDataFromCollection(collection, setRows,dependentFilter);
+  }, [loaded,dependentFilter]);
+
+  const fileUpload = useRef(null);
+  const handleFileChange = async (file) => {
+    const fileUrl = URL.createObjectURL(file);
     const response = await fetch(fileUrl);
     const text = await response.text();
-    const lines = text
+    const values = text
       .split("\n")
       .join("\r")
       .split("\r")
       .filter((item) => item != "");
-    lines.forEach((line) => {
-      addDocInCollectionByValue(
-        "classes",
-        "classname",
-        line.split(";")[0],
-        {
-          classname: line.split(";")[0],
-          school: "1298",
-          userid: "1",
-        },
-        setLoaded
-      );
-    });
+    makeDocsFromCSSLines(values);
     fileUpload.current.value = null;
   };
 
-  const [rows, setRows] = useState([]);
-  useEffect(() => {
-    getDataFromCollection("classes", setRows, buildRows);
-  }, [loaded]);
-
-  const fileUpload = useRef(null);
   const [selectedRows, setSelectedRows] = useState([]);
   const [rowModesModel, setRowModesModel] = useState({});
-
   const handleRowModesModelChange = (newRowModesModel) => {
     setRowModesModel(newRowModesModel);
+  };
+
+  const captureFilterIds = (ids) => {
+    return rows
+      .filter((item) => ids.includes(item.id))
+      .map((item) => ({ keyfield: item[keyfield], id: item.id }));
+  };
+
+  const handleSelection = (ids) => {
+    setFilters(captureFilterIds(ids));
+    setSelectedRows(ids);
   };
 
   return (
@@ -110,7 +141,7 @@ export function Classlist({ classes }) {
       <Button
         variant="outlined"
         onClick={() =>
-          deleteAllDocsInCollectionByIds("classes", selectedRows, setLoaded)
+          deleteAllDocsInCollectionByIds(collection, selectedRows, setLoaded)
         }
       >
         Удалить выбранные
@@ -121,7 +152,7 @@ export function Classlist({ classes }) {
         type="file"
         accept=".csv"
         ref={fileUpload}
-        onChange={handleFileChange}
+        onChange={(e) => handleFileChange(e.target.files[0])}
       />
       <DataGrid
         editMode="row"
@@ -129,9 +160,7 @@ export function Classlist({ classes }) {
         checkboxSelection
         rows={rows}
         columns={columns}
-        onRowSelectionModelChange={(ids) => {
-          setSelectedRows(ids);
-        }}
+        onRowSelectionModelChange={handleSelection}
         processRowUpdate={processRowUpdate}
         onRowEditStop={handleRowEditStop}
         onRowModesModelChange={handleRowModesModelChange}
@@ -140,7 +169,7 @@ export function Classlist({ classes }) {
           toolbar: EditToolbar,
         }}
         slotProps={{
-          toolbar: { setRows, setRowModesModel, rows },
+          toolbar: { setRows, setRowModesModel, rows, addrow },
         }}
         initialState={{
           pagination: {
@@ -148,7 +177,7 @@ export function Classlist({ classes }) {
           },
           columns: {
             columnVisibilityModel: {
-              id: false,
+              // id: false,
             },
           },
         }}
