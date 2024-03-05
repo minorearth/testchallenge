@@ -17,21 +17,11 @@ import { useRouter } from 'next/navigation'
 // import { redirect } from 'next/navigation'
 
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { initializeApp } from "firebase/app";
 
 import { getSession, login, logout } from "../../session";
+import {app} from '../datamodel'
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBwMnO7HaGuHu6LrzsTj6y6J9BojyC1ei0",
-  authDomain: "testchallenge-52d1b.firebaseapp.com",
-  projectId: "testchallenge-52d1b",
-  storageBucket: "testchallenge-52d1b.appspot.com",
-  messagingSenderId: "785621858975",
-  appId: "1:785621858975:web:e1fcef81ff499466bd40aa",
-  measurementId: "G-E08Z0JNFH2",
-};
 
-export const app = initializeApp(firebaseConfig);
 
 function Copyright(props) {
   return (
@@ -51,13 +41,10 @@ function Copyright(props) {
   );
 }
 
-// TODO remove, this demo shouldn't need to reset the theme.
-
-// const defaultTheme = createTheme();
 
 export function SignInSide() {
     const router = useRouter()
-  const auth = getAuth();
+  const auth = getAuth(app);
   const handleSubmit = async (event) => {
     // "use server"
     event.preventDefault();
@@ -70,11 +57,11 @@ export function SignInSide() {
         await signInWithEmailAndPassword(auth, email, password);
         // setIsAuthenticated(true);
         await login(email, password);
-        router.push("/main")
+        router.push("/main/taskmanager")
         // const smth = await getSession();
         // console.log(smth);
 
-        console.log("success");
+        // console.log("success");
         // redirect('/main')
       } catch (error) {
         console.log("error");
@@ -164,7 +151,7 @@ export function SignInSide() {
               onClick={() => {
                 const zu = async () => {
                   const smth = await getSession();
-                  console.log(smth);
+                  // console.log(smth);
                 };
                 zu();
               }}

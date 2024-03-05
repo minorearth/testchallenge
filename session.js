@@ -25,8 +25,8 @@ export async function decrypt(input) {
 
 export async function login(email) {
   const user = { email: email };
-  console.log(user);
-  const expires = new Date(Date.now() + 10 * 1000);
+  // console.log(user);
+  const expires = new Date(Date.now() + 100 * 1000);
   const session = await encrypt({ user, expires });
   cookies().set("session", user, { expires, httpOnly: true });
 }
@@ -46,7 +46,7 @@ export async function updateSession(request) {
   const session = request.cookies.get("session")?.value;
   if (!session) return;
   const parsed = await decrypt(session);
-  parsed.expires = new Date(Date.now() + 10 * 1000);
+  parsed.expires = new Date(Date.now() + 100 * 1000);
   const res = NextResponse.next();
   res.cookies.set({
     name: "session",

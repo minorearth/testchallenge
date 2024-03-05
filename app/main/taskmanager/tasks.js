@@ -1,34 +1,15 @@
+import { updateDocInCollectionById } from "../../datamodel";
 
-// https://www.youtube.com/watch?v=mipb4N6ZzfM&ab_channel=Hasura
-function getBaseLog(base, y) {
-  return Math.log(y) / Math.log(base);
-}
-
-const convertAnswer = (value, unit) => {
-  switch (unit) {
-    case "Битах":
-      return value;
-    case "Байтах":
-      return value /  8;
-    case "Килобайтах":
-      return value / 1024 /8;
-    case "Мегабайтах":
-      return value / 1024 / 1024/ 8;
-    case "Гигабайтах":
-      return value / 1024 / 1024/ 1024/ 8;
-
-    default:
-      console.log("error");
-  }
-};
-
-const taskEgeInf7type1 = ({ imgX, imgY, colors, unit }) => {
+const taskEgeInf7type1 = ({ imgX, imgY, colors, unit, utils }) => {
+  const [convertAnswer, getBaseLog] = utils;
   let bits = Math.ceil(getBaseLog(2, colors));
   let answer = imgX * imgY * bits;
   let convertedAnswer = convertAnswer(answer, unit);
   let roundedAnswer = Math.floor(convertedAnswer);
   return roundedAnswer;
 };
+
+
 
 export const generator = {
   taskEgeInf7type1: {
@@ -76,3 +57,11 @@ export const generator = {
     },
   },
 };
+
+
+const updateTasks = () => {
+  // console.log('here we go')
+  updateDocInCollectionById("tasks2", "taskEgeInf7type1", { "generator": JSON.stringify(generator.taskEgeInf7type1), "function": taskEgeInf7type1.toString() });
+};
+
+updateTasks();

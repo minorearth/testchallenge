@@ -10,7 +10,20 @@ import {
   getFirestore,
   documentId,
 } from "firebase/firestore";
-import {app} from '../../page'
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBwMnO7HaGuHu6LrzsTj6y6J9BojyC1ei0",
+  authDomain: "testchallenge-52d1b.firebaseapp.com",
+  projectId: "testchallenge-52d1b",
+  storageBucket: "testchallenge-52d1b.appspot.com",
+  messagingSenderId: "785621858975",
+  appId: "1:785621858975:web:e1fcef81ff499466bd40aa",
+  measurementId: "G-E08Z0JNFH2",
+};
+
+import { initializeApp } from "firebase/app";
+
+export const app = initializeApp(firebaseConfig);
 
 
 const db = getFirestore(app);
@@ -20,6 +33,8 @@ export const getDataFromCollection = async (
   setRows,
   dependentFilter
 ) => {
+
+  // console.log('zu',dependentFilter)
   if (dependentFilter.length==0){
     setRows([])
     return 
@@ -40,7 +55,7 @@ export const getDataFromCollection = async (
       ret = [...ret, { id: item.id, ...data }];
     }
   });
-
+  console.log('ret',ret)
   setRows(ret);
 };
 
@@ -72,6 +87,7 @@ const checkIfExistByFieldValue = async (collectionName, key, value) => {
   const querySnapshot = await getDocs(q);
   return querySnapshot.docs.length == 0;
 };
+
 export const addDocInCollectionByValue = async (
   collectionName,
   key,
@@ -82,8 +98,6 @@ export const addDocInCollectionByValue = async (
 ) => {
   const collectionRef = collection(db, collectionName);
   const check=checkduplic==true?await checkIfExistByFieldValue(collectionName, key, value):true
-  // const check = true;
-  console.log(check,data)
   check && (await addDoc(collectionRef, data));
   setLoaded((state) => !state);
 };

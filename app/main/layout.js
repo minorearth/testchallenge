@@ -142,7 +142,7 @@ export default function RootLayout({ children }) {
             <Divider />
             <List>
               {[
-                { text: "Генератор", link: "/main" },
+                { text: "Генератор", link: "/main/taskmanager" },
                 { text: "Классы", link: "/main/classes" },
               ].map((item, index) => (
                 <ListItem

@@ -17,7 +17,7 @@ import {
   getDataFromCollection,
   updateDocInCollectionById,
   addDocInCollection,
-} from "./datamodel";
+} from "../../datamodel";
 
 const makeEmptyDoc = (columns) => {
   return columns

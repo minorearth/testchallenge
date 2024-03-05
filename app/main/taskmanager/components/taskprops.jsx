@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { DataGrid, GridRowsProp, GridColDef } from "@mui/x-data-grid";
 import { UnitsManager } from "./unitsManager";
 import { generator } from "../tasks";
+import { useTaskutils } from "../taskutils";
+import { getDataFromCollection } from "../../../datamodel";
 
 function combineArrays(array_of_arrays) {
   let odometer = new Array(array_of_arrays.length);
@@ -79,27 +81,50 @@ const extractPropNames = (props) => {
   return Object.keys(props);
 };
 
-const makeInput = (row, props, propNames) => {
+const makeInput = (row, props, propNames, utils) => {
+
   let a = {};
   propNames.forEach((item) => (a[props[item].name] = row[item]));
+  a = { ...a, utils: utils };
+  
   return a;
 };
 
-const fulfillWithAnswers = (pop, props, propNames, f) => {
+const fulfillWithAnswers = (pop, props, propNames, utils, taskFunction) => {
+  // console.log('props',pop, props, propNames, f, utils, taskFunction)
   return pop.map((item) => {
-    return { ...item, answer: f(makeInput(item, props, propNames), "Kb") };
+    return {
+      ...item,
+      answer: taskFunction.call( null, makeInput(item, props, propNames, utils)),
+    };
+    // return { ...item, answer: f(makeInput(item, props, propNames, utils)) };
   });
 };
+
 
 export const TaskProps = () => {
   const [rows, setRows] = useState([]);
   const [columns, setCols] = useState([]);
+  const utils = useTaskutils();
+  // console.log(utils);
 
   const [taskProfile, setTaskProfile] = useState();
+  const [taskFunction, setTaskFunction] = useState();
+  const [taskProfileDB, setTaskProfileDB] = useState([]);
   const [tasksShown, setTasksShown] = useState();
   useEffect(() => {
-    setTaskProfile(generator["taskEgeInf7type1"]);
+    getDataFromCollection("tasks2", setTaskProfileDB, "none");
   }, []);
+
+  useEffect(() => {
+    if (taskProfileDB.length != 0) {
+      setTaskProfile(JSON.parse(taskProfileDB[0].generator));
+      let func = new Function("{ return " + taskProfileDB[0].function + " }");
+      setTaskFunction(func); //invoke the function using argu
+      console.log('1')
+    }
+  }, [taskProfileDB]);
+
   if (taskProfile == undefined) {
     return <p>Loading</p>;
   }
@@ -110,7 +135,7 @@ export const TaskProps = () => {
         name="postContent"
         rows={4}
         cols={40}
-        defaultValue={taskProfile != undefined && taskProfile.task}
+        defaultValue={taskProfileDB != undefined && taskProfile.task}
       />
       {Object.keys(taskProfile.props).map(
         (item) =>
@@ -137,12 +162,14 @@ export const TaskProps = () => {
       <button
         onClick={() => {
           let pop = combineArrays(collectArrays(taskProfile.props));
-
+          // (pop, props, propNames, utils, taskFunction)
           pop = fulfillWithAnswers(
             pop,
             taskProfile.props,
             extractPropNames(taskProfile.props),
-            taskProfile.execution
+            // taskProfile.execution,
+            utils,
+            taskFunction
           );
           setCols(makeGridHeader(taskProfile));
 

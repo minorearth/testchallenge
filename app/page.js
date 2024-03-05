@@ -1,16 +1,5 @@
 import { SignInSide } from "./login";
-
-
-
-
 export default function App2() {
-
-
-
-
- 
-
-
   return (
     <>
         <SignInSide  />
