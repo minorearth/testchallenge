@@ -1,20 +1,10 @@
-import { SignInSide } from "./login";
+"use client";
 
+import { TaskProps } from "./components/taskprops";
 
-
-
-export default function App2() {
-
-
-
-
- 
-
-
+export default function Home() {
   return (
-    <>
-        <SignInSide  />
-    </>
+        <TaskProps />
   );
 }
 

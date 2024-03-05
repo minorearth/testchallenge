@@ -26,10 +26,10 @@ export default function Classes() {
   return (
     <div className="flex flex-row h-full p-4">
       <div className="flex-1">
-      <Datagrid collection = "classes" keyfield="classname" columns={classcolumns} dependentFilter="none" setFilters={setClassFilters}/>
+      <Datagrid collection = "classes" keyfield="classname" columns={classcolumns} checkduplic={true} dependentFilter="none" setFilters={setClassFilters}/>
       </div>
       <div className="flex-1 ">
-      <Datagrid collection = "myusers" keyfield="username" columns={userscolumns} dependentFilter={classFilters} setFilters={()=>{}}/>
+      <Datagrid collection = "myusers" keyfield="username" columns={userscolumns} checkduplic={false} dependentFilter={classFilters} setFilters={()=>{}}/>
       </div>
     </div>
   );

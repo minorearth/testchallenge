@@ -60,9 +60,7 @@ export function Datagrid({
         }),
         {}
       );
-    
-      
-      return {...cols,extid: dependentFilter[0].id, keyfield: dependentFilter[0].keyfield}
+      return {...cols,extid: dependentFilter[0].id==undefined?'Не указано':dependentFilter[0].id, keyfield: dependentFilter[0].keyfield==undefined?'Не указано':dependentFilter[0].keyfield}
   };
   
 
@@ -74,7 +72,8 @@ export function Datagrid({
         keyfield,
         item.split(";")[0],
         datas,
-        setLoaded
+        setLoaded,
+        checkduplic
       );
     });
 
@@ -98,7 +97,6 @@ export function Datagrid({
 
   const [rows, setRows] = useState([]);
   useEffect(() => {
-    console.log('rerender',dependentFilter)
     getDataFromCollection(collection, setRows,dependentFilter);
   }, [loaded,dependentFilter]);
 
