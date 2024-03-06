@@ -58,11 +58,6 @@ export function SignInSide() {
         // setIsAuthenticated(true);
         await login(email, password);
         router.push("/main/taskmanager")
-        // const smth = await getSession();
-        // console.log(smth);
-
-        // console.log("success");
-        // redirect('/main')
       } catch (error) {
         console.log("error");
       }
@@ -151,7 +146,6 @@ export function SignInSide() {
               onClick={() => {
                 const zu = async () => {
                   const smth = await getSession();
-                  // console.log(smth);
                 };
                 zu();
               }}

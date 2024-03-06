@@ -25,8 +25,7 @@ export async function decrypt(input) {
 
 export async function login(email) {
   const user = { email: email };
-  // console.log(user);
-  const expires = new Date(Date.now() + 100 * 1000);
+  const expires = new Date(Date.now() + 1000 * 1000);
   const session = await encrypt({ user, expires });
   cookies().set("session", user, { expires, httpOnly: true });
 }

@@ -144,6 +144,7 @@ export default function RootLayout({ children }) {
               {[
                 { text: "Генератор", link: "/main/taskmanager" },
                 { text: "Классы", link: "/main/classes" },
+                { text: "Классификатор", link: "/main/tasksclassifier" },
               ].map((item, index) => (
                 <ListItem
                   key={item.text}

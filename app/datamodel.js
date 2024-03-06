@@ -34,7 +34,6 @@ export const getDataFromCollection = async (
   dependentFilter
 ) => {
 
-  // console.log('zu',dependentFilter)
   if (dependentFilter.length==0){
     setRows([])
     return 
@@ -55,7 +54,6 @@ export const getDataFromCollection = async (
       ret = [...ret, { id: item.id, ...data }];
     }
   });
-  console.log('ret',ret)
   setRows(ret);
 };
 

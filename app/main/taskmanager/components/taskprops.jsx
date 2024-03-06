@@ -91,7 +91,6 @@ const makeInput = (row, props, propNames, utils) => {
 };
 
 const fulfillWithAnswers = (pop, props, propNames, utils, taskFunction) => {
-  // console.log('props',pop, props, propNames, f, utils, taskFunction)
   return pop.map((item) => {
     return {
       ...item,
@@ -106,12 +105,11 @@ export const TaskProps = () => {
   const [rows, setRows] = useState([]);
   const [columns, setCols] = useState([]);
   const utils = useTaskutils();
-  // console.log(utils);
-
   const [taskProfile, setTaskProfile] = useState();
   const [taskFunction, setTaskFunction] = useState();
   const [taskProfileDB, setTaskProfileDB] = useState([]);
   const [tasksShown, setTasksShown] = useState();
+  
   useEffect(() => {
     getDataFromCollection("tasks2", setTaskProfileDB, "none");
   }, []);
@@ -120,8 +118,7 @@ export const TaskProps = () => {
     if (taskProfileDB.length != 0) {
       setTaskProfile(JSON.parse(taskProfileDB[0].generator));
       let func = new Function("{ return " + taskProfileDB[0].function + " }");
-      setTaskFunction(func); //invoke the function using argu
-      console.log('1')
+      setTaskFunction(func); 
     }
   }, [taskProfileDB]);
 
@@ -162,12 +159,10 @@ export const TaskProps = () => {
       <button
         onClick={() => {
           let pop = combineArrays(collectArrays(taskProfile.props));
-          // (pop, props, propNames, utils, taskFunction)
           pop = fulfillWithAnswers(
             pop,
             taskProfile.props,
             extractPropNames(taskProfile.props),
-            // taskProfile.execution,
             utils,
             taskFunction
           );
