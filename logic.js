@@ -6,7 +6,6 @@
 
 // const f = (input) => {
 //   const [a,b]=input.split("");
-//   console.log(input, !((a === b))*1) 
 
 //   return;
 // };

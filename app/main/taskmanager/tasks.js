@@ -60,7 +60,6 @@ export const generator = {
 
 
 const updateTasks = () => {
-  console.log('here we go')
   updateDocInCollectionById("tasks2", "taskEgeInf7type1", { "generator": JSON.stringify(generator.taskEgeInf7type1), "function": taskEgeInf7type1.toString(), "name":"Такая фот задача" });
 };
 

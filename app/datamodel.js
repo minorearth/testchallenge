@@ -9,6 +9,7 @@ import {
   deleteDoc,
   getFirestore,
   documentId,
+  getDoc,
 } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -25,7 +26,6 @@ import { initializeApp } from "firebase/app";
 
 export const app = initializeApp(firebaseConfig);
 
-
 const db = getFirestore(app);
 
 export const getDataFromCollection = async (
@@ -33,18 +33,17 @@ export const getDataFromCollection = async (
   setRows,
   dependentFilter
 ) => {
-
-  if (dependentFilter.length==0){
-    setRows([])
-    return 
+  if (dependentFilter.length == 0) {
+    setRows([]);
+    return;
   }
   const col = collection(db, collectionName);
-  let q
+  let q;
   if (dependentFilter != "none") {
-    const ids=dependentFilter.map(item=>item.id)
-    q = query(col, where('extid', "in", ids))
+    const ids = dependentFilter.map((item) => item.id);
+    q = query(col, where("extid", "in", ids));
   } else {
-    q = query(col);  
+    q = query(col);
   }
   const Snapshot = await getDocs(q);
   let ret = [];
@@ -57,6 +56,14 @@ export const getDataFromCollection = async (
   setRows(ret);
 };
 
+export const getDocFromCollectionById = async (collectionName, setRows, id) => {
+  const docRef = doc(db, collectionName, id);
+  const docSnap = await getDoc(docRef);
+  const data = docSnap.data();
+  const ret = { id: docSnap.id, ...data };
+  setRows(ret);
+};
+
 export const deleteAllDocsInCollection = async (collectionName) => {
   const collectionRef = collection(db, collectionName);
   const citySnapshot = await getDocs(collectionRef);
@@ -64,6 +71,7 @@ export const deleteAllDocsInCollection = async (collectionName) => {
     deleteDoc(doc(db, collectionName, item.id));
   });
 };
+
 export const deleteAllDocsInCollectionByIds = async (
   collectionName,
   ids,
@@ -95,7 +103,10 @@ export const addDocInCollectionByValue = async (
   checkduplic
 ) => {
   const collectionRef = collection(db, collectionName);
-  const check=checkduplic==true?await checkIfExistByFieldValue(collectionName, key, value):true
+  const check =
+    checkduplic == true
+      ? await checkIfExistByFieldValue(collectionName, key, value)
+      : true;
   check && (await addDoc(collectionRef, data));
   setLoaded((state) => !state);
 };
