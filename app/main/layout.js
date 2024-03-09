@@ -22,6 +22,8 @@ import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
 import { useRouter } from "next/navigation";
+import {updateTasks} from '../main/taskmanager/tasks'
+import { Button } from "@mui/material";
 
 const drawerWidth = 240;
 
@@ -108,81 +110,81 @@ export default function RootLayout({ children }) {
   const router = useRouter();
 
   return (
+    <div className="flex flex-row h-screen">
+      <AppBar position="fixed" open={open}>
+        <Toolbar>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            onClick={handleDrawerOpen}
+            edge="start"
+            sx={{
+              marginRight: 5,
+              ...(open && { display: "none" }),
+            }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" noWrap component="div">
+            Mini variant drawer
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      <Drawer variant="permanent" open={open}>
+        <DrawerHeader>
+          <IconButton onClick={handleDrawerClose}>
+            {theme.direction === "rtl" ? (
+              <ChevronRightIcon />
+            ) : (
+              <ChevronLeftIcon />
+            )}
+          </IconButton>
+        </DrawerHeader>
+        <Divider />
 
-        <div className="flex flex-row h-screen">
-          <AppBar position="fixed" open={open}>
-            <Toolbar>
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                onClick={handleDrawerOpen}
-                edge="start"
+ 
+
+        <List>
+          {[
+            { text: "Генератор", link: "/main/taskmanager" },
+            { text: "Классы", link: "/main/classes" },
+            { text: "Классификатор", link: "/main/tasksclassifier" },
+          ].map((item, index) => (
+            <ListItem
+              key={item.text}
+              disablePadding
+              sx={{ display: "block" }}
+              onClick={() => router.push(item.link)}
+            >
+              <ListItemButton
                 sx={{
-                  marginRight: 5,
-                  ...(open && { display: "none" }),
+                  minHeight: 48,
+                  justifyContent: open ? "initial" : "center",
+                  px: 2.5,
                 }}
               >
-                <MenuIcon />
-              </IconButton>
-              <Typography variant="h6" noWrap component="div">
-                Mini variant drawer
-              </Typography>
-            </Toolbar>
-          </AppBar> 
-          <Drawer variant="permanent" open={open}>
-            <DrawerHeader>
-              <IconButton onClick={handleDrawerClose}>
-                {theme.direction === "rtl" ? (
-                  <ChevronRightIcon />
-                ) : (
-                  <ChevronLeftIcon />
-                )}
-              </IconButton>
-            </DrawerHeader>
-            <Divider />
-            <List>
-              {[
-                { text: "Генератор", link: "/main/taskmanager" },
-                { text: "Классы", link: "/main/classes" },
-                { text: "Классификатор", link: "/main/tasksclassifier" },
-              ].map((item, index) => (
-                <ListItem
-                  key={item.text}
-                  disablePadding
-                  sx={{ display: "block" }}
-                  onClick={() => router.push(item.link)}
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 3 : "auto",
+                    justifyContent: "center",
+                  }}
                 >
-                  <ListItemButton
-                    sx={{
-                      minHeight: 48,
-                      justifyContent: open ? "initial" : "center",
-                      px: 2.5,
-                    }}
-                  >
-                    <ListItemIcon
-                      sx={{
-                        minWidth: 0,
-                        mr: open ? 3 : "auto",
-                        justifyContent: "center",
-                      }}
-                    >
-                      {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={item.text}
-                      sx={{ opacity: open ? 1 : 0 }}
-                    />
-                  </ListItemButton>
-                </ListItem>
-              ))}
-            </List>
-           
-          </Drawer>
-          <div className="p-3 flex-grow">
-            <DrawerHeader />
-            {children}
-          </div>
-        </div>
-
+                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                </ListItemIcon>
+                <ListItemText
+                  primary={item.text}
+                  sx={{ opacity: open ? 1 : 0 }}
+                />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      </Drawer>
+      <div className="p-3 flex-grow">
+        <DrawerHeader />
+        {children}
+      </div>
+    </div>
   );
 }

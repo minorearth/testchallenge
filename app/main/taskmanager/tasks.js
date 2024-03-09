@@ -6,14 +6,14 @@ const taskEgeInf7type1 = ({ imgX, imgY, colors, unit, utils }) => {
   let answer = imgX * imgY * bits;
   let convertedAnswer = convertAnswer(answer, unit);
   let roundedAnswer = Math.floor(convertedAnswer);
-  return roundedAnswer;
+  return roundedAnswer
 };
 
 
 
 export const generator = {
   taskEgeInf7type1: {
-    execution: taskEgeInf7type1,
+    // execution: taskEgeInf7type1,
 
     task: "Какой минимальный объём памяти нужно \
   зарезервировать, чтобы можно было сохранить любое растровое \
@@ -21,14 +21,17 @@ export const generator = {
   могут использоваться [colors] различных цветов? Ответ дайте в [unit]. В ответе запишите только целое \
   число, единицу измерения писать не нужно.",
 
+    order: ["prop0","prop1","prop2","prop3"],
     props: {
       prop0: {
         name: "imgX",
         type: "generator",
         title: "Разрешение по X",
         start: 128,
-        end: 1024,
+        end: 256,
         step: 128,
+        range: [128,256]
+        // range: [128,256,384,512,640,768,896,1024]
       },
 
       prop1: {
@@ -36,16 +39,21 @@ export const generator = {
         type: "generator",
         title: "Разрешение по Y",
         start: 128,
-        end: 1024,
+        end: 384,
         step: 128,
+        range: [128,256,384]
+        // range: [128,256,384,512,640,768,896,1024]
+
       },
       prop2: {
         name: "colors",
         type: "generator",
         title: "Количество цветов",
         start: 256,
-        end: 1024,
+        end: 384,
         step: 128,
+        // range: [256,384,512,640,768,896,1024]
+        range: [256,384]
       },
       prop3: {
         name: "unit",
@@ -59,8 +67,9 @@ export const generator = {
 };
 
 
-const updateTasks = () => {
-  updateDocInCollectionById("tasks2", "taskEgeInf7type1", { "generator": JSON.stringify(generator.taskEgeInf7type1), "function": taskEgeInf7type1.toString(), "name":"Такая фот задача" });
+export const  updateTasks = () => {
+  updateDocInCollectionById("tasks2", "taskEgeInf7type1", { "generator": generator['taskEgeInf7type1'], "function": taskEgeInf7type1.toString(), "name":"Такая фот задача" });
+  // updateDocInCollectionById("tasks2", "taskEgeInf7type1", { "generator": JSON.stringify(generator.taskEgeInf7type1), "function": taskEgeInf7type1.toString(), "name":"Такая фот задача" });
 };
 
-updateTasks();
+

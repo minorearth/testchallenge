@@ -1,34 +1,64 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import { DataGrid} from "@mui/x-data-grid";
-import {Generator} from "./generator/generator"
-import {
-  getDocFromCollectionById,
-} from "../../../datamodel";
+import { DataGrid } from "@mui/x-data-grid";
+import { Generator } from "./generator/generator";
+import { getDocFromCollectionById } from "../../../datamodel";
+import { TaskVariants } from "../components/taskvariants/taskvariants";
+import { Button } from "@mui/material";
+import { updateTasks } from "../tasks";
 
+const makeGridHeader = (taskProfile) => {
+  let cols = Object.keys(taskProfile.props)
+    // .filter((item) => taskProfile.props[item].type == "generator")
+    .map((item, id) => {
+      return {
+        field: item,
+        headerName: taskProfile.props[item].title,
+        width: 150,
+      };
+    });
+  return [...cols, { field: "answer", headerName: "Ответ", width: 150 }];
+};
 
-
-
-
-export const TaskProps = () => {
+export const TaskProps = ({ collection }) => {
   const [rows, setRows] = useState([]);
   const [columns, setCols] = useState([]);
   const [taskProfile, setTaskProfile] = useState();
   const [taskFunction, setTaskFunction] = useState();
-  const [taskProfileDB, setTaskProfileDB] = useState([]);
-  const [tasksShown, setTasksShown] = useState();
+  const [refreshVariants, setRefreshVariants] = useState(true);
+  const [refreshTaskProfile, setRefreshTaskProfile] = useState(true);
+  const TaskId = "taskEgeInf7type1";
 
   useEffect(() => {
-    getDocFromCollectionById("tasks2", setTaskProfileDB, "taskEgeInf7type1");
+    // updateTasks();
+    getDocFromCollectionById(collection, TaskId).then((res) => {
+      if (res.length != 0) {
+        setTaskProfile(res.generator);
+        let func = new Function("{ return " + res.function + " }");
+        setTaskFunction(func);
+        setCols(makeGridHeader(res.generator));
+        res.variants != undefined && setRows(res.variants);
+      }
+    });
   }, []);
 
   useEffect(() => {
-    if (taskProfileDB.length != 0) {
-      setTaskProfile(JSON.parse(taskProfileDB.generator));
-      let func = new Function("{ return " + taskProfileDB.function + " }");
-      setTaskFunction(func);
-    }
-  }, [taskProfileDB]);
+    getDocFromCollectionById(collection, TaskId).then((res) => {
+      if (res.length != 0) {
+        setTaskProfile(res.generator);
+      }
+    });
+  }, [refreshTaskProfile]);
+
+
+  useEffect(() => {
+    getDocFromCollectionById(collection, TaskId).then((res) => {
+      if (res.length != 0) {
+        res.variants != undefined && setRows(res.variants);
+      }
+    });
+  }, [refreshVariants]);
+
 
   if (taskProfile == undefined) {
     return <p>Loading</p>;
@@ -40,11 +70,28 @@ export const TaskProps = () => {
         name="postContent"
         rows={4}
         cols={40}
-        defaultValue={taskProfileDB != undefined && taskProfile.task}
+        defaultValue={taskProfile != undefined && taskProfile.task}
       />
-      <Generator setCols={setCols} setRows={setRows} taskProfile={taskProfile} setTaskProfile={setTaskProfile} taskFunction={taskFunction}/>
+      <Generator
+        TaskId={TaskId}
+        taskProfile={taskProfile}
+        setTaskProfile={setTaskProfile}
+        taskFunction={taskFunction}
+        collection={collection}
+        setRefreshVariants={setRefreshVariants}
+        setRefreshTaskProfile={setRefreshTaskProfile}
+        
+      />
       <div style={{ height: 300, width: "100%" }}>
-        <DataGrid rows={rows} columns={columns} />
+        <TaskVariants
+          rows={rows}
+          columns={columns}
+          collection="tasks2"
+          keyfield="none"
+          checkduplic={false}
+          dependentFilter="none"
+          setFilters={() => {}}
+        />
       </div>
     </>
   );

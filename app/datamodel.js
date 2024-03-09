@@ -10,6 +10,7 @@ import {
   getFirestore,
   documentId,
   getDoc,
+  updateDoc
 } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -56,12 +57,12 @@ export const getDataFromCollection = async (
   setRows(ret);
 };
 
-export const getDocFromCollectionById = async (collectionName, setRows, id) => {
+export const getDocFromCollectionById = async (collectionName, id) => {
   const docRef = doc(db, collectionName, id);
   const docSnap = await getDoc(docRef);
   const data = docSnap.data();
   const ret = { id: docSnap.id, ...data };
-  setRows(ret);
+  return ret
 };
 
 export const deleteAllDocsInCollection = async (collectionName) => {
@@ -119,4 +120,13 @@ export const addDocInCollection = async (collectionName, data, setRows) => {
 
 export const updateDocInCollectionById = async (collectionName, id, data) => {
   setDoc(doc(db, collectionName, id), data);
+};
+
+export const updateDocFieldsInCollectionById = async (
+  collectionName,
+  id,
+  data
+) => {
+  const Ref =doc(db, collectionName, id)
+  await updateDoc(Ref, data)
 };

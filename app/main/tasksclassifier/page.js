@@ -56,6 +56,7 @@ const taskscolumns = [
   { field: "name", headerName: "Название", editable: true, width: 130 },
   { field: "generator", headerName: "Генератор", editable: true, width: 130 },
   { field: "function", headerName: "Функция", editable: true, width: 130 },
+  { field: "variants", headerName: "Варианты", editable: true, width: 130 },
 ];
 
 export default function RichObjectTreeView() {
