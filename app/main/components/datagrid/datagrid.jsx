@@ -3,22 +3,61 @@ import { DataGrid, GridToolbarContainer } from "@mui/x-data-grid";
 import { useEffect, useState, useRef } from "react";
 import { Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import { InvisibleInput } from "./invisibleinput";
-import { useDatagrid } from "./ViewModel";
+import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined";
+import DriveFileMoveOutlinedIcon from "@mui/icons-material/DriveFileMoveOutlined";
+import CreateOutlinedIcon from "@mui/icons-material/CreateOutlined";
+import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import { InvisibleInput } from "../invisibleinput";
+import { useDatagrid } from "./ViewModel.js";
 
-function EditToolbar({ addrow, uploadDataFromCss, deleteRows }) {
+// { delete, copy, edittask, csvload, add, move}
+function EditToolbar({ addrow, uploadDataFromCss, deleteRows, showhidetool,actions }) {
   return (
     <GridToolbarContainer>
-      <InvisibleInput handleFileChange={uploadDataFromCss} />
+      <InvisibleInput
+        handleFileChange={uploadDataFromCss}
+        vis={showhidetool.csvload}
+      />
       <Button
         color="primary"
-        startIcon={<AddIcon />}
+        startIcon={<DeleteOutlineOutlinedIcon />}
         onClick={() => deleteRows()}
+        sx={{ display: showhidetool.delete }}
       >
         Удалить выбранные
       </Button>
-      <Button color="primary" startIcon={<AddIcon />} onClick={addrow}>
+      <Button
+        color="primary"
+        startIcon={<AddIcon />}
+        sx={{ display: showhidetool.add }}
+        onClick={addrow}
+      >
         Добавить
+      </Button>
+      <Button
+        color="primary"
+        startIcon={<CreateOutlinedIcon />}
+        sx={{ display: showhidetool.edittask }}
+        onClick={addrow}
+      >
+        Отредактировать
+      </Button>
+      <Button
+        color="primary"
+        startIcon={<DriveFileMoveOutlinedIcon />}
+        sx={{ display: showhidetool.move }}
+        onClick={actions.action1}
+      >
+        Переместить
+      </Button>
+      <Button
+        color="primary"
+        startIcon={<ContentCopyOutlinedIcon />}
+        sx={{ display: showhidetool.copy }}
+        onClick={addrow}
+      >
+        Скопировать
       </Button>
     </GridToolbarContainer>
   );
@@ -31,6 +70,8 @@ export function Datagrid({
   dependentFilter,
   setFilters,
   checkduplic,
+  showhidetool,
+  actions,
 }) {
   const [loaded, setLoaded] = useState(true);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -89,7 +130,7 @@ export function Datagrid({
           toolbar: EditToolbar,
         }}
         slotProps={{
-          toolbar: { uploadDataFromCss, addrow, deleteRows },
+          toolbar: { uploadDataFromCss, addrow, deleteRows, showhidetool,actions },
         }}
         initialState={{
           pagination: {

@@ -22,7 +22,7 @@ import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
 import { useRouter } from "next/navigation";
-import {updateTasks} from '../main/taskmanager/tasks'
+import {updateTasks} from './tasks'
 import { Button } from "@mui/material";
 
 const drawerWidth = 240;

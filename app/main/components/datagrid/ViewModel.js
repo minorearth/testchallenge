@@ -4,7 +4,7 @@ import {
   getDataFromCollection,
   updateDocInCollectionById,
   addDocInCollection,
-} from "../../datamodel";
+} from "../../../datamodel";
 
 export const useDatagrid = (
   collection,
@@ -99,11 +99,16 @@ export const useDatagrid = (
     makeDocsFromCSSLines(values);
     // fileUpload.current.value = null;
   };
-
+  // interface GridFilter {
+  //   id: string;
+  // }
+  // interface GridFilters {
+  //   ids: GridFilter[];
+  // }
   const captureFilterIds = (ids) => {
     return rows
       .filter((item) => ids.includes(item.id))
-      .map((item) => ({ keyfield: item[keyfield], id: item.id }));
+      .map((item) => ({ id: item.id }));
   };
 
   const getGridData = () => {

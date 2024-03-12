@@ -40,8 +40,6 @@ export const TaskVariants = ({
     addrow,
     uploadDataFromCss,
     RowUpdate,
-    captureFilterIds,
-    getGridData,
   ] = useTaskVariants();
 
   const handleRowEditStop = (params, event) => {

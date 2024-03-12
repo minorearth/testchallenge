@@ -10,7 +10,7 @@ import {
   getFirestore,
   documentId,
   getDoc,
-  updateDoc
+  updateDoc,
 } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -51,6 +51,7 @@ export const getDataFromCollection = async (
   Snapshot.forEach((item) => {
     {
       const data = item.data();
+
       ret = [...ret, { id: item.id, ...data }];
     }
   });
@@ -62,7 +63,7 @@ export const getDocFromCollectionById = async (collectionName, id) => {
   const docSnap = await getDoc(docRef);
   const data = docSnap.data();
   const ret = { id: docSnap.id, ...data };
-  return ret
+  return ret;
 };
 
 export const deleteAllDocsInCollection = async (collectionName) => {
@@ -118,6 +119,15 @@ export const addDocInCollection = async (collectionName, data, setRows) => {
   setRows((oldRows) => [{ id: doc.id, ...data }, ...oldRows]);
 };
 
+export const updateMultipleDocInCollectionById = async (
+  collectionName,
+  ids,
+  data
+) => {
+  ids.forEach((item) => {
+    updateDoc(doc(db, collectionName, item.id), data);
+  });
+};
 export const updateDocInCollectionById = async (collectionName, id, data) => {
   setDoc(doc(db, collectionName, id), data);
 };
@@ -127,6 +137,6 @@ export const updateDocFieldsInCollectionById = async (
   id,
   data
 ) => {
-  const Ref =doc(db, collectionName, id)
-  await updateDoc(Ref, data)
+  const Ref = doc(db, collectionName, id);
+  await updateDoc(Ref, data);
 };

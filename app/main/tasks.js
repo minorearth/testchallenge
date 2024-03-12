@@ -1,4 +1,4 @@
-import { updateDocInCollectionById } from "../../datamodel";
+import { updateDocInCollectionById } from "../datamodel";
 
 const taskEgeInf7type1 = ({ imgX, imgY, colors, unit, utils }) => {
   const [convertAnswer, getBaseLog] = utils;
@@ -59,7 +59,7 @@ export const generator = {
         name: "unit",
         type: "picklist",
         title: "Единицы измерения ответа",
-        values: ["b", "bt", "Kb", "Mb", "Gb"],
+        values: ["Битах", "Байтах", "Килобайтах", "Мегабайтах", "Гигабайтах"],
         range: ["Битах", "Байтах", "Килобайтах", "Мегабайтах", "Гигабайтах"],
       },
     },
@@ -68,8 +68,27 @@ export const generator = {
 
 
 export const  updateTasks = () => {
-  updateDocInCollectionById("tasks2", "taskEgeInf7type1", { "generator": generator['taskEgeInf7type1'], "function": taskEgeInf7type1.toString(), "name":"Такая фот задача" });
-  // updateDocInCollectionById("tasks2", "taskEgeInf7type1", { "generator": JSON.stringify(generator.taskEgeInf7type1), "function": taskEgeInf7type1.toString(), "name":"Такая фот задача" });
+  updateDocInCollectionById("tasks2", "taskEgeInf7type1", { "extid": "0", "generator": generator['taskEgeInf7type1'], "function": taskEgeInf7type1.toString(), "name":"Такая фот задача" });
 };
 
+
+const f = (x, A) => {return ((x % 2 != 0) || (x % 3 != 0) || (x + A >= 100))}
+
+const gan=(n)=>Array.from({ length: n }, (_, i) => i + 1)
+const ff=(xlimit)=> {
+  const x = gan(xlimit)
+  for (let A = 1; A < 1000; A++) {
+    if (x.every(item => f(item, A))) {
+      return A
+
+    } }}
+// console.log(ff(1000))
+
+//******do not delete
+// const f=(a,b)=>{return a+b}
+// const ff=(f,a,b)=>{
+// const adder = new Function(`{ return ${f} }`);
+// return adder()(a,b)
+// }
+// console.log(ff(f.toString(),5,5))
 

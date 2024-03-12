@@ -5,7 +5,7 @@ import { Generator } from "./generator/generator";
 import { getDocFromCollectionById } from "../../../datamodel";
 import { TaskVariants } from "../components/taskvariants/taskvariants";
 import { Button } from "@mui/material";
-import { updateTasks } from "../tasks";
+import { updateTasks } from "../../tasks";
 
 const makeGridHeader = (taskProfile) => {
   let cols = Object.keys(taskProfile.props)
@@ -30,7 +30,7 @@ export const TaskProps = ({ collection }) => {
   const TaskId = "taskEgeInf7type1";
 
   useEffect(() => {
-    // updateTasks();
+    updateTasks();
     getDocFromCollectionById(collection, TaskId).then((res) => {
       if (res.length != 0) {
         setTaskProfile(res.generator);

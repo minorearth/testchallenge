@@ -1,5 +1,5 @@
 import React from "react";
-import { Propinput } from "./propinput";
+import { Propinput } from "./rangeinput";
 import { useState, useEffect, useRef } from "react";
 import {
   addDocInCollectionByValue,
@@ -45,7 +45,6 @@ export const RangeManager = ({ item, propName, setRefreshTaskProfile }) => {
       const path = `generator.props.${propName}.${item}`;
       return { ...acc, [path]: parsedValue };
     }, {});
-    console.log(ob);
     await updateDocFieldsInCollectionById("tasks2", "taskEgeInf7type1", ob);
   };
 
@@ -67,7 +66,6 @@ export const RangeManager = ({ item, propName, setRefreshTaskProfile }) => {
           color="primary"
           startIcon={<AddIcon />}
           onClick={() => {
-            console.log(rmState);
             refreshRange();
           }}
         >

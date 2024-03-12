@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { Button } from "@mui/material";
-import { Datagrid } from "../components/datagrid";
+import { Datagrid } from "../components/datagrid/datagrid";
 import { useEffect, useState, useRef } from "react";
 
 export default function Classes() {
@@ -35,7 +35,16 @@ export default function Classes() {
           columns={classcolumns}
           checkduplic={true}
           dependentFilter="none"
+          showhidetool={{
+            delete: false,
+            copy: "none",
+            edittask: "none",
+            csvload: false,
+            add: false,
+            move:"none"
+          }}
           setFilters={setClassFilters}
+          actions="none"
         />
       </div>
       <div className="flex-1 ">
@@ -45,7 +54,16 @@ export default function Classes() {
           columns={userscolumns}
           checkduplic={false}
           dependentFilter={classFilters}
+          showhidetool={{
+            delete: true,
+            copy: "none",
+            edittask: "none",
+            csvload: false,
+            add: false,
+            move:"none"
+          }}
           setFilters={() => {}}
+          actions="none"
         />
       </div>
     </div>

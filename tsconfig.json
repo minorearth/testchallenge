@@ -3,8 +3,9 @@
     "lib": [
       "dom",
       "dom.iterable",
-      "esnext"
+      "esnext",
     ],
+
     "allowJs": true,
     "skipLibCheck": true,
     "strict": false,
@@ -28,8 +29,9 @@
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "app/main/components/datagrid/ViewModel.js"  ],
   "exclude": [
     "node_modules"
   ]
 }
+
