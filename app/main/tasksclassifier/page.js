@@ -9,23 +9,24 @@ import { Tree } from "./components/tree";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
+import EditIcon from '@mui/icons-material/Edit';
+
+import { useRouter } from "next/navigation";
 
 import {
-  addDocInCollectionByValue,
-  deleteAllDocsInCollectionByIds,
-  getDataFromCollection,
-  updateDocInCollectionById,
-  addDocInCollection,
+  GridActionsCellItem,
+} from '@mui/x-data-grid';
+
+import {
+
   updateMultipleDocInCollectionById,
 } from "../../datamodel";
 
-const taskscolumns = [
-  { field: "id", headerName: "id", width: 270 },
-  { field: "name", headerName: "Название", editable: true, width: 130 },
-  { field: "generator", headerName: "Генератор", editable: true, width: 130 },
-  { field: "function", headerName: "Функция", editable: true, width: 130 },
-  { field: "variants", headerName: "Варианты", editable: true, width: 130 },
-];
+
+
+  
+
+
 
 const style = {
   position: "absolute",
@@ -40,6 +41,30 @@ const style = {
 };
 
 export default function RichObjectTreeView() {
+
+  // const [activeStep, setActiveStep] = useState(1);
+  const router = useRouter();
+
+  const handleEditClick =(id)=>{
+    router.push(`/main/tasksclassifier/${id}`);
+  }
+
+  const taskscolumns = [
+    { field: "id", headerName: "id", width: 270 },
+    { field: "name", headerName: "Название", editable: true, width: 130 },
+    { field: "generator", headerName: "Генератор", editable: true, width: 130 },
+    { field: "function", headerName: "Функция", editable: true, width: 130 },
+    { field: "variants", headerName: "Варианты", editable: true, width: 130 },
+    {
+      field: 'actions',
+      type: 'actions',
+      getActions: ({id}) => [
+        <GridActionsCellItem label="Edit" icon={<EditIcon />} onClick={()=>handleEditClick(id)}  />,
+      ]
+    }
+  ];
+  
+  const collection = "tasks2";
   const [tasksFilters, setTasksFilters] = useState([]);
 
   const [open, setOpen] = useState(false);
@@ -48,50 +73,50 @@ export default function RichObjectTreeView() {
   const handleModalOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const moveTasks = (selectedFolderToMove) => {
-    // console.log(selectedTasks,selectedFolderToMove)
-    updateMultipleDocInCollectionById("tasks2", selectedTasks, {
+    updateMultipleDocInCollectionById(collection, selectedTasks, {
       extid: selectedFolderToMove.id,
     });
-    setOpen(false)
+    setOpen(false);
   };
 
   return (
     <Box sx={{ minHeight: 110, flexGrow: 1 }}>
-      <Tree setSelected={setSelectedFolder} />
-      <Datagrid
-        collection="tasks2"
-        keyfield="name"
-        columns={taskscolumns}
-        checkduplic={false}
-        showhidetool={{
-          delete: "none",
-          copy: true,
-          edittask: true,
-          csvload: "none",
-          add: "none",
-          move: true,
-        }}
-        // dependentFilter={tasksFilters}
-        dependentFilter={[selectedFolder]}
-        setFilters={setSelectedTasks}
-        actions={{ action1: handleModalOpen, action1: handleModalOpen }}
-      />
+      {/* <HorizontalLinearStepper /> */}
+      <div className="flex-row">
+        <Tree setSelected={setSelectedFolder} />
+        <Datagrid
+          collection={collection}
+          keyfield="name"
+          columns={taskscolumns}
+          checkduplic={false}
+          showhidetool={{
+            delete: "none",
+            copy: true,
+            edittask: true,
+            csvload: "none",
+            add: "none",
+            move: true,
+          }}
+          dependentFilter={selectedFolder}
+          setFilters={setSelectedTasks}
+          actions={{ action1: handleModalOpen, action1: handleModalOpen }}
+        />
 
-      <Button onClick={handleModalOpen}>Open modal</Button>
-      {/* <Button onClick={MoveTasks}>Move</Button> */}
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Выберите новое местоположение
-          </Typography>
-          <Tree setSelected={moveTasks} />
-        </Box>
-      </Modal>
+        {/* <Button onClick={handleModalOpen}>Open modal</Button> */}
+        <Modal
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={style}>
+            <Typography id="modal-modal-title" variant="h6" component="h2">
+              Выберите новое местоположение
+            </Typography>
+            <Tree setSelected={moveTasks} />
+          </Box>
+        </Modal>
+      </div>
     </Box>
   );
 }

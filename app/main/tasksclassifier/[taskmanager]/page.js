@@ -2,9 +2,11 @@
 
 import { TaskProps } from "./components/taskprops";
 
-export default function Home() {
+export default function Home({ params }) {
   return (
-        <TaskProps collection="tasks2"/>
+    <>
+      <TaskProps collection="tasks2" TaskId={params.taskmanager} />
+    </>
   );
 }
 

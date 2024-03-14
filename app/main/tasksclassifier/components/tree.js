@@ -51,9 +51,7 @@ const data = {
 export const Tree = ({ setSelected }) => {
 
   const handleNodeSelection = (e, ids) => {
-    console.log(e)
-
-    setSelected({'id': ids});
+    setSelected([{'id': ids}]);
   };
 
   const renderTree = (nodes) => (

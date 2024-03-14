@@ -22,11 +22,11 @@ export const Generator = ({
   );
 
   return (
-    <>
+    <div>
       {taskProfile.order.map(
-        (item) =>
+        (item,id) =>
           taskProfile.props[item].type == "generator" && (
-            <>
+            <div key={item}>
               <Divider textAlign="left" sx={{ my: 2 }}>
                 {taskProfile.props[item].name}
               </Divider>
@@ -34,14 +34,16 @@ export const Generator = ({
                 item={taskProfile.props[item]}
                 propName={item}
                 setRefreshTaskProfile={setRefreshTaskProfile}
+                TaskId={TaskId}
+                collection={collection}
               />
-            </>
+            </div>
           )
       )}
       {taskProfile.order.map(
         (item) =>
           taskProfile.props[item].type == "picklist" && (
-            <>
+            <div key={item}>
               <Divider textAlign="left" sx={{ my: 2 }}>
                 {taskProfile.props[item].name}
               </Divider>
@@ -50,8 +52,10 @@ export const Generator = ({
                 item={taskProfile.props[item]}
                 propName={item}
                 setRefreshTaskProfile={setRefreshTaskProfile}
+                TaskId={TaskId}
+                collection={collection}
               />
-            </>
+            </div>
           )
       )}
       <button
@@ -60,6 +64,6 @@ export const Generator = ({
       >
         Сгенерировать и проверить задачи
       </button>
-    </>
+    </div>
   );
 };

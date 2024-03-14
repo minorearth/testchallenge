@@ -3,13 +3,9 @@ import { Propinput } from "./rangeinput";
 import { useState, useEffect } from "react";
 import {MSelect} from './mselect'
 import {
-  addDocInCollectionByValue,
-  deleteAllDocsInCollectionByIds,
-  getDataFromCollection,
-  updateDocInCollectionById,
-  addDocInCollection,
+
   updateDocFieldsInCollectionById,
-} from "../../../../../datamodel";
+} from "../../../../../../datamodel";
 
 import { Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
@@ -20,13 +16,14 @@ export const UnitsManager = ({
   item,
   propName,
   setRefreshTaskProfile,
+  TaskId, collection
 }) => {
   const [selectedValues, setSelectedValues] = useState(item.range);
 
   const updateRange = async () => {
     const path = `generator.props.${propName}.range`;
     const ob={ [path]: selectedValues };
-    await updateDocFieldsInCollectionById("tasks2", "taskEgeInf7type1", ob);
+    await updateDocFieldsInCollectionById(collection, TaskId, ob);
   };
 
   const saveStates = () => {

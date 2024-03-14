@@ -13,15 +13,13 @@ import Grid from "@mui/material/Grid";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation";
 // import { redirect } from 'next/navigation'
 
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 import { getSession, login, logout } from "../../session";
-import {app} from '../datamodel'
-
-
+import { app } from "../datamodel";
 
 function Copyright(props) {
   return (
@@ -41,12 +39,10 @@ function Copyright(props) {
   );
 }
 
-
 export function SignInSide() {
-    const router = useRouter()
+  const router = useRouter();
   const auth = getAuth(app);
   const handleSubmit = async (event) => {
-    // "use server"
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const email = data.get("email");
@@ -57,7 +53,7 @@ export function SignInSide() {
         await signInWithEmailAndPassword(auth, email, password);
         // setIsAuthenticated(true);
         await login(email, password);
-        router.push("/main/taskmanager")
+        router.push("/main/tasksclassifier");
       } catch (error) {
         console.log("error");
       }

@@ -2,10 +2,10 @@ import React from "react";
 import { useEffect, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { Generator } from "./generator/generator";
-import { getDocFromCollectionById } from "../../../datamodel";
-import { TaskVariants } from "../components/taskvariants/taskvariants";
+import { getDocFromCollectionById } from "../../../../datamodel";
+import { TaskVariants } from "./taskvariants/taskvariants";
 import { Button } from "@mui/material";
-import { updateTasks } from "../../tasks";
+import { updateTasks } from "../../../tasks";
 
 const makeGridHeader = (taskProfile) => {
   let cols = Object.keys(taskProfile.props)
@@ -20,14 +20,14 @@ const makeGridHeader = (taskProfile) => {
   return [...cols, { field: "answer", headerName: "Ответ", width: 150 }];
 };
 
-export const TaskProps = ({ collection }) => {
+export const TaskProps = ({ collection,TaskId }) => {
   const [rows, setRows] = useState([]);
   const [columns, setCols] = useState([]);
   const [taskProfile, setTaskProfile] = useState();
   const [taskFunction, setTaskFunction] = useState();
   const [refreshVariants, setRefreshVariants] = useState(true);
   const [refreshTaskProfile, setRefreshTaskProfile] = useState(true);
-  const TaskId = "taskEgeInf7type1";
+  
 
   useEffect(() => {
     updateTasks();
@@ -86,7 +86,7 @@ export const TaskProps = ({ collection }) => {
         <TaskVariants
           rows={rows}
           columns={columns}
-          collection="tasks2"
+          collection={collection}
           keyfield="none"
           checkduplic={false}
           dependentFilter="none"

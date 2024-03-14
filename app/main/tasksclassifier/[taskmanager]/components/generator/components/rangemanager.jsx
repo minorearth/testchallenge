@@ -2,18 +2,15 @@ import React from "react";
 import { Propinput } from "./rangeinput";
 import { useState, useEffect, useRef } from "react";
 import {
-  addDocInCollectionByValue,
-  deleteAllDocsInCollectionByIds,
-  getDataFromCollection,
-  updateDocInCollectionById,
-  addDocInCollection,
   updateDocFieldsInCollectionById,
-} from "../../../../../datamodel";
+} from "../../../../../../datamodel";
 
 import { Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
+import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
 
-export const RangeManager = ({ item, propName, setRefreshTaskProfile }) => {
+export const RangeManager = ({ item, propName, setRefreshTaskProfile, TaskId, collection }) => {
   const generateRange = (start, end, step) => {
     let ret = [];
     for (let i = Number(start); i <= Number(end); i += Number(step)) {
@@ -45,7 +42,7 @@ export const RangeManager = ({ item, propName, setRefreshTaskProfile }) => {
       const path = `generator.props.${propName}.${item}`;
       return { ...acc, [path]: parsedValue };
     }, {});
-    await updateDocFieldsInCollectionById("tasks2", "taskEgeInf7type1", ob);
+    await updateDocFieldsInCollectionById(collection, TaskId, ob);
   };
 
   const saveStates = () => {
@@ -57,14 +54,16 @@ export const RangeManager = ({ item, propName, setRefreshTaskProfile }) => {
   return (
     <>
       <div className="flex flex-row">
-        <Propinput attName="start" setRmState={setRmState} rmState={rmState} />
+        <Propinput attName="start" setRmState={setRmState} rmState={rmState}/>
         <Propinput attName="end" setRmState={setRmState} rmState={rmState} />
         <Propinput attName="step" setRmState={setRmState} rmState={rmState} />
   
 
         <Button
+
+          key="btn"
           color="primary"
-          startIcon={<AddIcon />}
+          startIcon={<RefreshOutlinedIcon />}
           onClick={() => {
             refreshRange();
           }}
@@ -74,9 +73,9 @@ export const RangeManager = ({ item, propName, setRefreshTaskProfile }) => {
 
         <Propinput attName="range" setRmState={setRmState} rmState={rmState} />
 
-        <Button
+        <Button key="btn2"
           color="primary"
-          startIcon={<AddIcon />}
+          startIcon={<SaveOutlinedIcon />}
           onClick={() => {
             saveStates();
           }}

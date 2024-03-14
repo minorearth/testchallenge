@@ -1,12 +1,8 @@
-import { useTaskutils } from "../../../taskutils";
+import { useTaskutils } from "../../../../taskutils";
 import {
-  addDocInCollectionByValue,
-  deleteAllDocsInCollectionByIds,
-  getDataFromCollection,
-  updateDocInCollectionById,
-  addDocInCollection,
+
   updateDocFieldsInCollectionById,
-} from "../../../../datamodel";
+} from "../../../../../datamodel";
 
 function combineArrays(array_of_arrays) {
   let odometer = new Array(array_of_arrays.length);

@@ -101,7 +101,7 @@ export function Datagrid({
 
   useEffect(() => {
     getGridData();
-  }, [loaded, dependentFilter]);
+  }, [dependentFilter,loaded]);
 
   const [rowModesModel, setRowModesModel] = useState({});
   const handleRowModesModelChange = (newRowModesModel) => {

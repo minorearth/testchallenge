@@ -1,4 +1,4 @@
-import { updateDocInCollectionById } from "../datamodel";
+import { updateDocInCollectionById,addDocInCollection } from "../datamodel";
 
 const taskEgeInf7type1 = ({ imgX, imgY, colors, unit, utils }) => {
   const [convertAnswer, getBaseLog] = utils;
@@ -13,8 +13,6 @@ const taskEgeInf7type1 = ({ imgX, imgY, colors, unit, utils }) => {
 
 export const generator = {
   taskEgeInf7type1: {
-    // execution: taskEgeInf7type1,
-
     task: "Какой минимальный объём памяти нужно \
   зарезервировать, чтобы можно было сохранить любое растровое \
   изображение размером [imgX]×[imgY] пикселей при условии, что в изображении \
@@ -68,7 +66,8 @@ export const generator = {
 
 
 export const  updateTasks = () => {
-  updateDocInCollectionById("tasks2", "taskEgeInf7type1", { "extid": "0", "generator": generator['taskEgeInf7type1'], "function": taskEgeInf7type1.toString(), "name":"Такая фот задача" });
+  // updateDocInCollectionById("tasks2", "taskEgeInf7type1", { "extid": "0", "generator": generator['taskEgeInf7type1'], "function": taskEgeInf7type1.toString(), "name":"Такая фот задача" });
+  // addDocInCollection("tasks2", { "extid": "0", "description":"Такая вот задача про картинку", "generator": generator['taskEgeInf7type1'], "function": taskEgeInf7type1.toString() },()=>{});
 };
 
 

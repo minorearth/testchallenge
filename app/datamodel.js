@@ -11,6 +11,7 @@ import {
   documentId,
   getDoc,
   updateDoc,
+  writeBatch,
 } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -29,14 +30,42 @@ export const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
 
+// export const getDataFromCollection = async (
+//   collectionName,
+//   setRows,
+//   dependentFilter
+// ) => {
+//   console.log("sdsd", dependentFilter, dependentFilter.length);
+//   if (dependentFilter.length == 0) {
+//     setRows([]);
+//     return;
+//   }
+//   const col = collection(db, collectionName);
+//   let q;
+//   if (dependentFilter != "none") {
+//     const ids = dependentFilter.map((item) => item.id);
+//     q = query(col, where("extid", "in", ids));
+//   } else {
+//     q = query(col);
+//   }
+//   const Snapshot = await getDocs(q);
+//   let ret = [];
+//   Snapshot.forEach((item) => {
+//     {
+//       const data = item.data();
+
+//       ret = [...ret, { id: item.id, ...data }];
+//     }
+//   });
+//   setRows(ret);
+// };
+
 export const getDataFromCollection = async (
   collectionName,
-  setRows,
   dependentFilter
 ) => {
   if (dependentFilter.length == 0) {
-    setRows([]);
-    return;
+    return [];
   }
   const col = collection(db, collectionName);
   let q;
@@ -46,47 +75,48 @@ export const getDataFromCollection = async (
   } else {
     q = query(col);
   }
-  const Snapshot = await getDocs(q);
-  let ret = [];
-  Snapshot.forEach((item) => {
-    {
-      const data = item.data();
-
-      ret = [...ret, { id: item.id, ...data }];
-    }
-  });
-  setRows(ret);
+  return await getDocs(q);
+  
 };
 
 export const getDocFromCollectionById = async (collectionName, id) => {
-  const docRef = doc(db, collectionName, id);
-  const docSnap = await getDoc(docRef);
+  const docSnap = await getDoc(doc(db, collectionName, id));
   const data = docSnap.data();
-  const ret = { id: docSnap.id, ...data };
-  return ret;
+  return { id: docSnap.id, ...data };
 };
 
 export const deleteAllDocsInCollection = async (collectionName) => {
-  const collectionRef = collection(db, collectionName);
-  const citySnapshot = await getDocs(collectionRef);
+  const citySnapshot = await getDocs(collection(db, collectionName));
   citySnapshot.forEach((item) => {
     deleteDoc(doc(db, collectionName, item.id));
   });
 };
 
-export const deleteAllDocsInCollectionByIds = async (
-  collectionName,
-  ids,
-  setLoaded
-) => {
-  const collectionRef = collection(db, collectionName);
-  const q = query(collectionRef, where(documentId(), "in", ids));
+// export const deleteAllDocsInCollectionByIds = async (
+//   collectionName,
+//   ids
+// ) => {
 
-  const Snapshot = await getDocs(q);
-  for (let i in Snapshot.docs) {
-    await deleteDoc(doc(db, collectionName, Snapshot.docs[i].id));
-  }
-  setLoaded((state) => !state);
+// sdfsdfds
+
+// const batch = writeBatch(db);
+
+//   const collectionRef = collection(db, collectionName);
+//   const q = query(collectionRef, where(documentId(), "in", ids));
+
+//   const Snapshot = await getDocs(q);
+//   for (let i in Snapshot.docs) {
+//     await deleteDoc(doc(db, collectionName, Snapshot.docs[i].id));
+//   }
+//   ;
+// };
+
+export const deleteAllDocsInCollectionByIds = async (collectionName, ids) => {
+  const batch = writeBatch(db);
+  ids.forEach((item) => {
+    batch.delete(doc(db, collectionName, item));
+  });
+  await batch.commit()
 };
 
 const checkIfExistByFieldValue = async (collectionName, key, value) => {
@@ -114,9 +144,8 @@ export const addDocInCollectionByValue = async (
 };
 
 export const addDocInCollection = async (collectionName, data, setRows) => {
-  const collectionRef = collection(db, collectionName);
-  const doc = await addDoc(collectionRef, data);
-  setRows((oldRows) => [{ id: doc.id, ...data }, ...oldRows]);
+  return await addDoc(collection(db, collectionName), data);
+  
 };
 
 export const updateMultipleDocInCollectionById = async (
@@ -137,6 +166,5 @@ export const updateDocFieldsInCollectionById = async (
   id,
   data
 ) => {
-  const Ref = doc(db, collectionName, id);
-  await updateDoc(Ref, data);
+  await updateDoc(doc(db, collectionName, id), data);
 };

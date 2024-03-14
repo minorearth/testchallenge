@@ -22,8 +22,10 @@ import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
 import { useRouter } from "next/navigation";
-import {updateTasks} from './tasks'
+import { updateTasks } from "./tasks";
 import { Button } from "@mui/material";
+import DvrOutlinedIcon from '@mui/icons-material/DvrOutlined';
+import DoorSlidingOutlinedIcon from '@mui/icons-material/DoorSlidingOutlined';
 
 const drawerWidth = 240;
 
@@ -142,43 +144,60 @@ export default function RootLayout({ children }) {
         </DrawerHeader>
         <Divider />
 
- 
-
         <List>
-          {[
-            { text: "Генератор", link: "/main/taskmanager" },
-            { text: "Классы", link: "/main/classes" },
-            { text: "Классификатор", link: "/main/tasksclassifier" },
-          ].map((item, index) => (
-            <ListItem
-              key={item.text}
-              disablePadding
-              sx={{ display: "block" }}
-              onClick={() => router.push(item.link)}
+          <ListItem
+            key="Классы"
+            disablePadding
+            sx={{ display: "block" }}
+            onClick={() => router.push("/main/classes")}
+          >
+            <ListItemButton
+              sx={{
+                minHeight: 48,
+                justifyContent: open ? "initial" : "center",
+                px: 2.5,
+              }}
             >
-              <ListItemButton
+              <ListItemIcon
                 sx={{
-                  minHeight: 48,
-                  justifyContent: open ? "initial" : "center",
-                  px: 2.5,
+                  minWidth: 0,
+                  mr: open ? 3 : "auto",
+                  justifyContent: "center",
                 }}
               >
-                <ListItemIcon
-                  sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : "auto",
-                    justifyContent: "center",
-                  }}
-                >
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                </ListItemIcon>
-                <ListItemText
-                  primary={item.text}
-                  sx={{ opacity: open ? 1 : 0 }}
-                />
-              </ListItemButton>
-            </ListItem>
-          ))}
+                <DoorSlidingOutlinedIcon />
+              </ListItemIcon>
+              <ListItemText primary="Классы" sx={{ opacity: open ? 1 : 0 }} />
+            </ListItemButton>
+          </ListItem>
+          <ListItem
+            key="Классификатор"
+            disablePadding
+            sx={{ display: "block" }}
+            onClick={() => router.push("/main/tasksclassifier")}
+          >
+            <ListItemButton
+              sx={{
+                minHeight: 48,
+                justifyContent: open ? "initial" : "center",
+                px: 2.5,
+              }}
+            >
+              <ListItemIcon
+                sx={{
+                  minWidth: 0,
+                  mr: open ? 3 : "auto",
+                  justifyContent: "center",
+                }}
+              >
+                <DvrOutlinedIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary="Классификатор"
+                sx={{ opacity: open ? 1 : 0 }}
+              />
+            </ListItemButton>
+          </ListItem>
         </List>
       </Drawer>
       <div className="p-3 flex-grow">
