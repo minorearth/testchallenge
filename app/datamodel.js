@@ -60,6 +60,17 @@ const db = getFirestore(app);
 //   setRows(ret);
 // };
 
+const DBDocsToObject=(docs)=>{
+  let ret = [];
+      docs.forEach((item) => {
+        {
+          const data = item.data();
+          ret = [...ret, { id: item.id, ...data }];
+        }
+      });
+  return ret
+    }
+
 export const getDataFromCollection = async (
   collectionName,
   dependentFilter
@@ -75,7 +86,7 @@ export const getDataFromCollection = async (
   } else {
     q = query(col);
   }
-  return await getDocs(q);
+  return DBDocsToObject(await getDocs(q));
   
 };
 
@@ -116,14 +127,38 @@ export const deleteAllDocsInCollectionByIds = async (collectionName, ids) => {
   ids.forEach((item) => {
     batch.delete(doc(db, collectionName, item));
   });
-  await batch.commit()
+  await batch.commit();
 };
 
 const checkIfExistByFieldValue = async (collectionName, key, value) => {
+  console.log("sdsd", collectionName, key, value);
   const collectionRef = collection(db, collectionName);
   const q = query(collectionRef, where(key, "==", value));
   const querySnapshot = await getDocs(q);
   return querySnapshot.docs.length == 0;
+};
+
+export const addMultipledDocsInCollectionByValue = async (
+  collectionName,
+  keyField,
+  data,
+  checkduplic
+) => {
+  const collectionRef = collection(db, collectionName);
+  const zu = data.map((item) => {
+    if (checkduplic == true) {
+      return checkIfExistByFieldValue(
+        collectionName,
+        keyField,
+        item[keyField]
+      ).then((res) => {
+        res && addDoc(collectionRef, item);
+      });
+    } else {
+      return addDoc(collectionRef, item);
+    }
+  });
+  await  Promise.allSettled(zu);
 };
 
 export const addDocInCollectionByValue = async (
@@ -140,12 +175,10 @@ export const addDocInCollectionByValue = async (
       ? await checkIfExistByFieldValue(collectionName, key, value)
       : true;
   check && (await addDoc(collectionRef, data));
-  setLoaded((state) => !state);
 };
 
 export const addDocInCollection = async (collectionName, data, setRows) => {
   return await addDoc(collection(db, collectionName), data);
-  
 };
 
 export const updateMultipleDocInCollectionById = async (

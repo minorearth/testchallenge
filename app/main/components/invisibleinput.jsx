@@ -1,17 +1,20 @@
 import React from "react";
 import { Button } from "@mui/material";
-import { useRef} from "react";
+import { useRef } from "react";
 import AddIcon from "@mui/icons-material/Add";
-import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
+import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 
-
-
-export const InvisibleInput = ({handleFileChange,vis}) => {
+export const InvisibleInput = ({ handleFileChange, vis }) => {
   const fileUpload = useRef(null);
 
   return (
     <>
-      <Button color="primary" sx={{ display: vis }} startIcon={<FileDownloadOutlinedIcon />} onClick={() => fileUpload.current.click()}>
+      <Button
+        color="primary"
+        sx={{ display: vis }}
+        startIcon={<FileDownloadOutlinedIcon />}
+        onClick={() => fileUpload.current.click()}
+      >
         Загрузить из CSV
       </Button>
       <input
@@ -20,7 +23,13 @@ export const InvisibleInput = ({handleFileChange,vis}) => {
         type="file"
         accept=".csv"
         ref={fileUpload}
-        onChange={(e) => handleFileChange(e.target.files[0])}
+        onClick={(event) => {
+          event.target.value = null;
+        }}
+        onChange={(e) => {
+          console.log("there");
+          handleFileChange(e.target.files[0]);
+        }}
       />
     </>
   );

@@ -6,7 +6,6 @@ import AddIcon from "@mui/icons-material/Add";
 import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined";
 import DriveFileMoveOutlinedIcon from "@mui/icons-material/DriveFileMoveOutlined";
 import CreateOutlinedIcon from "@mui/icons-material/CreateOutlined";
-import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import { InvisibleInput } from "../invisibleinput";
 import { useDatagrid } from "./ViewModel.js";
@@ -71,7 +70,7 @@ export function Datagrid({
   setFilters,
   checkduplic,
   showhidetool,
-  actions,
+  actions, mode
 }) {
   const [loaded, setLoaded] = useState(true);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -92,7 +91,7 @@ export function Datagrid({
     dependentFilter,
     checkduplic,
     keyfield,
-    rows
+    rows, mode
   );
 
   const handleRowEditStop = (params, event) => {
@@ -100,7 +99,7 @@ export function Datagrid({
   };
 
   useEffect(() => {
-    getGridData();
+    getGridData(mode);
   }, [dependentFilter,loaded]);
 
   const [rowModesModel, setRowModesModel] = useState({});

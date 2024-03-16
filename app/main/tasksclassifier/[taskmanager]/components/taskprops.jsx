@@ -1,11 +1,9 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import { DataGrid } from "@mui/x-data-grid";
 import { Generator } from "./generator/generator";
 import { getDocFromCollectionById } from "../../../../datamodel";
-import { TaskVariants } from "./taskvariants/taskvariants";
-import { Button } from "@mui/material";
 import { updateTasks } from "../../../tasks";
+import {Datagrid} from "../../../../main/components/datagrid/datagrid"
 
 const makeGridHeader = (taskProfile) => {
   let cols = Object.keys(taskProfile.props)
@@ -82,15 +80,25 @@ export const TaskProps = ({ collection,TaskId }) => {
         setRefreshTaskProfile={setRefreshTaskProfile}
         
       />
-      <div style={{ height: 300, width: "100%" }}>
-        <TaskVariants
-          rows={rows}
+      <div style={{ width: "100%" }}>
+ 
+        <Datagrid
           columns={columns}
           collection={collection}
           keyfield="none"
           checkduplic={false}
-          dependentFilter="none"
+          dependentFilter={[{'id':TaskId}]}
           setFilters={() => {}}
+          mode='dataInObject'
+          showhidetool={{
+            delete: true,
+            copy: "none",
+            edittask: "none",
+            csvload: false,
+            add: false,
+            move:"none"
+          }}
+          actions={{ action1: ()=>{}, action1: ()=>{} }}
         />
       </div>
     </>
