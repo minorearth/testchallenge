@@ -9,9 +9,17 @@ import CreateOutlinedIcon from "@mui/icons-material/CreateOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import { InvisibleInput } from "../invisibleinput";
 import { useDatagrid } from "./ViewModel.js";
+import Modal from "@mui/material/Modal";
+
 
 // { delete, copy, edittask, csvload, add, move}
-function EditToolbar({ addrow, uploadDataFromCss, deleteRows, showhidetool,actions }) {
+function EditToolbar({
+  addrow,
+  uploadDataFromCss,
+  deleteRows,
+  showhidetool,
+  actions,
+}) {
   return (
     <GridToolbarContainer>
       <InvisibleInput
@@ -40,13 +48,21 @@ function EditToolbar({ addrow, uploadDataFromCss, deleteRows, showhidetool,actio
         sx={{ display: showhidetool.edittask }}
         onClick={addrow}
       >
-        Отредактировать
+        Отредактировать задачу
+      </Button>
+      <Button
+        color="primary"
+        startIcon={<CreateOutlinedIcon />}
+        sx={{ display: showhidetool.edittest }}
+        onClick={addrow}
+      >
+        Отредактировать тест
       </Button>
       <Button
         color="primary"
         startIcon={<DriveFileMoveOutlinedIcon />}
         sx={{ display: showhidetool.move }}
-        onClick={actions.action1}
+        onClick={actions.movetask}
       >
         Переместить
       </Button>
@@ -70,7 +86,8 @@ export function Datagrid({
   setFilters,
   checkduplic,
   showhidetool,
-  actions, mode
+  actions,
+  mode,
 }) {
   const [loaded, setLoaded] = useState(true);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -91,7 +108,8 @@ export function Datagrid({
     dependentFilter,
     checkduplic,
     keyfield,
-    rows, mode
+    rows,
+    mode
   );
 
   const handleRowEditStop = (params, event) => {
@@ -100,7 +118,7 @@ export function Datagrid({
 
   useEffect(() => {
     getGridData(mode);
-  }, [dependentFilter,loaded]);
+  }, [dependentFilter, loaded]);
 
   const [rowModesModel, setRowModesModel] = useState({});
   const handleRowModesModelChange = (newRowModesModel) => {
@@ -110,6 +128,10 @@ export function Datagrid({
   const handleSelection = (ids) => {
     setFilters(captureFilterIds(ids));
     setSelectedRows(ids);
+  };  
+  
+  const handleCellEditStart = (ids) => {
+    console.log('fig')
   };
 
   return (
@@ -123,13 +145,20 @@ export function Datagrid({
         onRowSelectionModelChange={handleSelection}
         processRowUpdate={RowUpdate}
         onRowEditStop={handleRowEditStop}
+        onCellEditStart={handleCellEditStart}
         onRowModesModelChange={handleRowModesModelChange}
         onProcessRowUpdateError={() => {}}
         slots={{
           toolbar: EditToolbar,
         }}
         slotProps={{
-          toolbar: { uploadDataFromCss, addrow, deleteRows, showhidetool,actions },
+          toolbar: {
+            uploadDataFromCss,
+            addrow,
+            deleteRows,
+            showhidetool,
+            actions,
+          },
         }}
         initialState={{
           pagination: {
@@ -143,6 +172,19 @@ export function Datagrid({
         }}
         pageSizeOptions={[5, 10]}
       />
+      {/* <Modal
+        open={openMoveModal}
+        onClose={() => setOpenMoveModal(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Выберите новое местоположение
+          </Typography>
+          <Tree setSelected={moveTasks} />
+        </Box>
+      </Modal> */}
     </div>
   );
 }

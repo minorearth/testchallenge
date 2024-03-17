@@ -66,8 +66,9 @@ export const generator = {
 
 
 export const  updateTasks = () => {
+  console.log('added')
   // updateDocInCollectionById("tasks2", "taskEgeInf7type1", { "extid": "0", "generator": generator['taskEgeInf7type1'], "function": taskEgeInf7type1.toString(), "name":"Такая фот задача" });
-  // addDocInCollection("tasks2", { "extid": "0", "description":"Такая вот задача про картинку", "generator": generator['taskEgeInf7type1'], "function": taskEgeInf7type1.toString() },()=>{});
+  addDocInCollection("tasks2", { "extid": "0", "description":generator['taskEgeInf7type1'].task, "generator": generator['taskEgeInf7type1'], "function": taskEgeInf7type1.toString() },()=>{});
 };
 
 

@@ -21,11 +21,12 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import { useRouter } from "next/navigation";
 import { updateTasks } from "./tasks";
 import { Button } from "@mui/material";
-import DvrOutlinedIcon from '@mui/icons-material/DvrOutlined';
-import DoorSlidingOutlinedIcon from '@mui/icons-material/DoorSlidingOutlined';
+import DvrOutlinedIcon from "@mui/icons-material/DvrOutlined";
+import DoorSlidingOutlinedIcon from "@mui/icons-material/DoorSlidingOutlined";
 
 const drawerWidth = 240;
 
@@ -145,59 +146,53 @@ export default function RootLayout({ children }) {
         <Divider />
 
         <List>
-          <ListItem
-            key="Классы"
-            disablePadding
-            sx={{ display: "block" }}
-            onClick={() => router.push("/main/classes")}
-          >
-            <ListItemButton
-              sx={{
-                minHeight: 48,
-                justifyContent: open ? "initial" : "center",
-                px: 2.5,
-              }}
+          {[
+            {
+              title: "Классы",
+              icon: <DoorSlidingOutlinedIcon />,
+              route: "/main/classes",
+            },
+            {
+              title: "Классификатор",
+              icon: <AccountTreeIcon />,
+              route: "/main/tasksclassifier",
+            },
+            {
+              title: "Тесты",
+              icon: <DvrOutlinedIcon />,
+              route: "/main/tests",
+            },
+          ].map((item) => (
+            <ListItem
+              key={item.title}
+              disablePadding
+              sx={{ display: "block" }}
+              onClick={() => router.push(item.route)}
             >
-              <ListItemIcon
+              <ListItemButton
                 sx={{
-                  minWidth: 0,
-                  mr: open ? 3 : "auto",
-                  justifyContent: "center",
+                  minHeight: 48,
+                  justifyContent: open ? "initial" : "center",
+                  px: 2.5,
                 }}
               >
-                <DoorSlidingOutlinedIcon />
-              </ListItemIcon>
-              <ListItemText primary="Классы" sx={{ opacity: open ? 1 : 0 }} />
-            </ListItemButton>
-          </ListItem>
-          <ListItem
-            key="Классификатор"
-            disablePadding
-            sx={{ display: "block" }}
-            onClick={() => router.push("/main/tasksclassifier")}
-          >
-            <ListItemButton
-              sx={{
-                minHeight: 48,
-                justifyContent: open ? "initial" : "center",
-                px: 2.5,
-              }}
-            >
-              <ListItemIcon
-                sx={{
-                  minWidth: 0,
-                  mr: open ? 3 : "auto",
-                  justifyContent: "center",
-                }}
-              >
-                <DvrOutlinedIcon />
-              </ListItemIcon>
-              <ListItemText
-                primary="Классификатор"
-                sx={{ opacity: open ? 1 : 0 }}
-              />
-            </ListItemButton>
-          </ListItem>
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 3 : "auto",
+                    justifyContent: "center",
+                  }}
+                >
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText
+                  primary={item.title}
+                  sx={{ opacity: open ? 1 : 0 }}
+                />
+              </ListItemButton>
+            </ListItem>
+          ))}
+          
         </List>
       </Drawer>
       <div className="p-3 flex-grow">
