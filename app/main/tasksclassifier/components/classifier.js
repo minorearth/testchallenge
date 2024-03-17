@@ -29,7 +29,7 @@ export const Classifier = () => {
     router.push(`/main/tasksclassifier/${id}`);
   };
 
-  const taskscolumns2 = [
+  const taskscolumns22 = [
     { field: "id", headerName: "id", width: 270 },
     {
       field: "description",
