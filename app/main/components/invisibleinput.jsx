@@ -27,7 +27,6 @@ export const InvisibleInput = ({ handleFileChange, vis }) => {
           event.target.value = null;
         }}
         onChange={(e) => {
-          console.log("there");
           handleFileChange(e.target.files[0]);
         }}
       />

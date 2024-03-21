@@ -10,7 +10,14 @@ import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined
 import { InvisibleInput } from "../invisibleinput";
 import { useDatagrid } from "./ViewModel.js";
 import Modal from "@mui/material/Modal";
-
+import { useRouter } from "next/navigation";
+import EditIcon from "@mui/icons-material/Edit";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import { GridActionsCellItem } from "@mui/x-data-grid";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import { tasks, classes, users, variants, tests } from "./dgsettings";
+import { ModalTS } from "../modal/modal";
 
 // { delete, copy, edittask, csvload, add, move}
 function EditToolbar({
@@ -62,7 +69,7 @@ function EditToolbar({
         color="primary"
         startIcon={<DriveFileMoveOutlinedIcon />}
         sx={{ display: showhidetool.move }}
-        onClick={actions.movetask}
+        onClick={() => actions.movetask()}
       >
         Переместить
       </Button>
@@ -74,53 +81,63 @@ function EditToolbar({
       >
         Скопировать
       </Button>
+      <Button
+        color="primary"
+        startIcon={<ContentCopyOutlinedIcon />}
+        sx={{ display: showhidetool.openTestSelected }}
+        onClick={()=>actions.openTestSelected()}
+      >
+        Создать тест
+      </Button>
     </GridToolbarContainer>
   );
 }
 
-export function Datagrid({
-  collection,
-  keyfield,
-  columns,
-  dependentFilter,
-  setFilters,
-  checkduplic,
-  showhidetool,
-  actions,
-  mode,
-}) {
+export function Datagrid(props) {
+  const {
+    actions,
+    dependentFilter,
+    mode,
+    columns,
+    collection,
+    setFilters,
+    sx,
+  } = props;
+
   const [loaded, setLoaded] = useState(true);
-  const [selectedRows, setSelectedRows] = useState([]);
+  const [modaltext, setdModaltext] = useState();
+  const [openViewModal, setOpenViewModal] = useState(false);
+  const [showhidetool, setShowhidetool] = useState({});
+  const [cols, setCols] = useState([]);
   const [rows, setRows] = useState([]);
-  const [
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [rowModesModel, setRowModesModel] = useState({});
+
+  const {
     deleteRows,
     addrow,
     uploadDataFromCss,
     RowUpdate,
     captureFilterIds,
     getGridData,
-  ] = useDatagrid(
-    collection,
-    selectedRows,
-    setLoaded,
-    columns,
-    setRows,
-    dependentFilter,
-    checkduplic,
-    keyfield,
-    rows,
-    mode
-  );
+  } = useDatagrid({
+    ...props,
+    selectedRows: selectedRows,
+    setLoaded: setLoaded,
+    cols: cols,
+    rows: rows,
+    setRows: setRows,
+  });
 
   const handleRowEditStop = (params, event) => {
     setRowModesModel({});
   };
 
-  useEffect(() => {
-    getGridData(mode);
-  }, [dependentFilter, loaded]);
+  const handleViewClick = (params) => {
+    setdModaltext(params.row.description);
+    setOpenViewModal(true);
+  };
 
-  const [rowModesModel, setRowModesModel] = useState({});
   const handleRowModesModelChange = (newRowModesModel) => {
     setRowModesModel(newRowModesModel);
   };
@@ -128,24 +145,77 @@ export function Datagrid({
   const handleSelection = (ids) => {
     setFilters(captureFilterIds(ids));
     setSelectedRows(ids);
-  };  
-  
-  const handleCellEditStart = (ids) => {
-    console.log('fig')
   };
 
+  const router = useRouter();
+  const handleEditClick = (id) => {
+    router.push(`/main/tasksclassifier/${id}`);
+  };
+
+  useEffect(() => {
+    getGridData(mode);
+  }, [dependentFilter, loaded]);
+
+  useEffect(() => {
+    getGridData(mode);
+    setCols(columns);
+    switch (collection + mode) {
+      case "tasks2simple":
+        setShowhidetool(tasks.showhidetool);
+        setCols([
+          tasks["columns"][1],
+          {
+            field: "actions",
+            type: "actions",
+            getActions: (params) => [
+              <GridActionsCellItem
+                label="Edit"
+                icon={<EditIcon />}
+                onClick={() => handleEditClick(params.id)}
+              />,
+              <GridActionsCellItem
+                label="View"
+                icon={<VisibilityOutlinedIcon />}
+                onClick={() => handleViewClick(params)}
+              />,
+            ],
+          },
+        ]);
+        break;
+      case "classessimple":
+        setShowhidetool(classes.showhidetool);
+        setCols(classes.columns);
+        break;
+      case "myuserssimple":
+        setShowhidetool(users.showhidetool);
+        setCols(users.columns);
+        break;
+      case "tasks2dataInObject":
+        setShowhidetool(variants.showhidetool);
+        setCols(columns);
+        break;
+      case "testssimple":
+        setShowhidetool(tests.showhidetool);
+        setCols(tests.columns);
+        break;
+      default:
+        console.log("Странно", columns);
+    }
+  }, []);
+
   return (
-    <div>
+    <React.Fragment>
       <DataGrid
+        sx={sx}
         editMode="row"
         rowModesModel={rowModesModel}
         checkboxSelection
         rows={rows}
-        columns={columns}
+        columns={cols}
         onRowSelectionModelChange={handleSelection}
         processRowUpdate={RowUpdate}
         onRowEditStop={handleRowEditStop}
-        onCellEditStart={handleCellEditStart}
+        // onCellEditStart={handleCellEditStart}
         onRowModesModelChange={handleRowModesModelChange}
         onProcessRowUpdateError={() => {}}
         slots={{
@@ -172,19 +242,17 @@ export function Datagrid({
         }}
         pageSizeOptions={[5, 10]}
       />
-      {/* <Modal
-        open={openMoveModal}
-        onClose={() => setOpenMoveModal(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Выберите новое местоположение
+
+      <ModalTS
+        open={openViewModal}
+        close={() => setOpenViewModal(false)}
+        sx={{ height: "30%", width: "30%" }} >
+          <Typography id="modal-modal-title" component="h2">
+            {modaltext}
           </Typography>
-          <Tree setSelected={moveTasks} />
-        </Box>
-      </Modal> */}
-    </div>
+      </ModalTS>
+
+  
+    </React.Fragment>
   );
 }

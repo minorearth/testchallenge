@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Generator } from "./generator/generator";
 import { getDocFromCollectionById } from "../../../../datamodel";
 import { updateTasks } from "../../../tasks";
-import {Datagrid} from "../../../../main/components/datagrid/datagrid"
+import { Datagrid } from "../../../../main/components/datagrid/datagrid";
 
 const makeGridHeader = (taskProfile) => {
   let cols = Object.keys(taskProfile.props)
@@ -18,17 +18,15 @@ const makeGridHeader = (taskProfile) => {
   return [...cols, { field: "answer", headerName: "Ответ", width: 150 }];
 };
 
-export const TaskProps = ({ collection,TaskId }) => {
+export const TaskProps = ({ collection, TaskId }) => {
   const [rows, setRows] = useState([]);
   const [columns, setCols] = useState([]);
   const [taskProfile, setTaskProfile] = useState();
   const [taskFunction, setTaskFunction] = useState();
   const [refreshVariants, setRefreshVariants] = useState(true);
   const [refreshTaskProfile, setRefreshTaskProfile] = useState(true);
-  
 
   useEffect(() => {
-    updateTasks();
     getDocFromCollectionById(collection, TaskId).then((res) => {
       if (res.length != 0) {
         setTaskProfile(res.generator);
@@ -48,7 +46,6 @@ export const TaskProps = ({ collection,TaskId }) => {
     });
   }, [refreshTaskProfile]);
 
-
   useEffect(() => {
     getDocFromCollectionById(collection, TaskId).then((res) => {
       if (res.length != 0) {
@@ -56,7 +53,6 @@ export const TaskProps = ({ collection,TaskId }) => {
       }
     });
   }, [refreshVariants]);
-
 
   if (taskProfile == undefined) {
     return <p>Loading</p>;
@@ -78,27 +74,17 @@ export const TaskProps = ({ collection,TaskId }) => {
         collection={collection}
         setRefreshVariants={setRefreshVariants}
         setRefreshTaskProfile={setRefreshTaskProfile}
-        
       />
       <div style={{ width: "100%" }}>
- 
         <Datagrid
           columns={columns}
           collection={collection}
+          mode="dataInObject"
           keyfield="none"
           checkduplic={false}
-          dependentFilter={[{'id':TaskId}]}
+          dependentFilter={[{ id: TaskId }]}
           setFilters={() => {}}
-          mode='dataInObject'
-          showhidetool={{
-            delete: true,
-            copy: "none",
-            edittask: "none",
-            csvload: false,
-            add: false,
-            move:"none"
-          }}
-          actions={{ action1: ()=>{}, action1: ()=>{} }}
+          actions={{ action1: () => {}, action1: () => {} }}
         />
       </div>
     </>

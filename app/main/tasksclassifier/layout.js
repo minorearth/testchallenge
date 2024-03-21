@@ -11,7 +11,7 @@ export default function RootLayout({ children }) {
   //   const theme = useTheme();
 
   return (
-    <div className="flex-1">
+    <div className="flex-1 w-full h-full">
       {/* <HorizontalLinearStepper /> */}
 
       {children}

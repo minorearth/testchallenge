@@ -4,8 +4,10 @@ import {
   getDataFromCollection,
   updateDocInCollectionById,
   addDocInCollection,
-  getDocFromCollectionById
+  getDocFromCollectionById,
 } from "../../../datamodel";
+
+
 
 import {
   makeDataFromCSSLine,
@@ -14,17 +16,17 @@ import {
   captureFilterIdsF,
 } from "../../../utils";
 
-export const useDatagrid = (
+export const useDatagrid = ({
   collection,
   selectedRows,
   setLoaded,
-  columns,
+  cols,
   setRows,
   dependentFilter,
   checkduplic,
   keyfield,
-  rows
-) => {
+  rows,
+}) => {
   const deleteRows = () => {
     deleteAllDocsInCollectionByIds(collection, selectedRows).then(() =>
       setLoaded((state) => !state)
@@ -39,7 +41,7 @@ export const useDatagrid = (
   };
 
   const addrow = () => {
-    const data = makeEmptyRowData(columns);
+    const data = makeEmptyRowData(cols);
     addDocInCollection(collection, data).then((doc) => {
       setRows((oldRows) => [{ id: doc.id, ...data }, ...oldRows]);
     });
@@ -54,7 +56,6 @@ export const useDatagrid = (
       makeDataFromCSSLine(item, columns, dependentFilter)
     );
   };
-  
 
   const uploadDataFromCss = async (file) => {
     const data = await makeDocsFromCSSLines(file);
@@ -70,29 +71,26 @@ export const useDatagrid = (
     return captureFilterIdsF(ids, rows);
   };
 
-
-
-  
   const getGridData = (mode) => {
-    mode!='dataInObject'?
-    getDataFromCollection(collection, dependentFilter).then((docs) => {
-    
-      setRows(docs);
-    }):   getDocFromCollectionById(collection, dependentFilter[0].id).then((res) => {
-      if (res.length != 0) {
-        res.variants != undefined && setRows(res.variants);
-      }
-    });
-
-
+    mode != "dataInObject"
+      ? getDataFromCollection(collection, dependentFilter).then((docs) => {
+          setRows(docs);
+        })
+      : getDocFromCollectionById(collection, dependentFilter[0].id).then(
+          (res) => {
+            if (res.length != 0) {
+              res.variants != undefined && setRows(res.variants);
+            }
+          }
+        );
   };
 
-  return [
+  return {
     deleteRows,
     addrow,
     uploadDataFromCss,
     RowUpdate,
     captureFilterIds,
     getGridData,
-  ];
+  };
 };
