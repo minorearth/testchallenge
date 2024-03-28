@@ -5,9 +5,8 @@ import {
   updateDocInCollectionById,
   addDocInCollection,
   getDocFromCollectionById,
+  copyDocInCollection,
 } from "../../../datamodel";
-
-
 
 import {
   makeDataFromCSSLine,
@@ -26,18 +25,47 @@ export const useDatagrid = ({
   checkduplic,
   keyfield,
   rows,
+  mode,
+  extRows,
+  extRowsSetter,
 }) => {
   const deleteRows = () => {
-    deleteAllDocsInCollectionByIds(collection, selectedRows).then(() =>
-      setLoaded((state) => !state)
-    );
+    switch (mode) {
+      case "externalData":
+        extRowsSetter(rows.filter((row) => !selectedRows.includes(row.id)));
+        break;
+      case "simple":
+        deleteAllDocsInCollectionByIds(collection, selectedRows).then(() =>
+          setLoaded((state) => !state)
+        );
+        break;
+      default:
+        break;
+    }
   };
 
   const RowUpdate = (newRow) => {
     const updatedRow = { ...newRow, isNew: false };
-    setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
-    updateDocInCollectionById(collection, newRow.id, newRow);
+    let updatedRows = rows.map((row) =>
+      row.id === newRow.id ? updatedRow : row
+    );
+    switch (mode) {
+      case "externalData":
+        extRowsSetter(updatedRows);
+        // setRows(updatedRows);
+        break;
+      case "simple":
+        setRows(updatedRows);
+        updateDocInCollectionById(collection, newRow.id, newRow);
+        break;
+      default:
+        break;
+    }
     return updatedRow;
+  };
+
+  const addTest = () => {
+    addDocInCollection("tests", { name: "Новый тест", content: extRows });
   };
 
   const addrow = () => {
@@ -45,6 +73,20 @@ export const useDatagrid = ({
     addDocInCollection(collection, data).then((doc) => {
       setRows((oldRows) => [{ id: doc.id, ...data }, ...oldRows]);
     });
+  };
+
+  const copyrow = () => {
+    switch (mode) {
+      case "externalData":
+        break;
+      case "simple":
+        copyDocInCollection(collection, selectedRows).then(() =>
+          setLoaded((state) => !state)
+        );
+        break;
+      default:
+        break;
+    }
   };
 
   const makeDocsFromCSSLines = async (file) => {
@@ -71,18 +113,26 @@ export const useDatagrid = ({
     return captureFilterIdsF(ids, rows);
   };
 
-  const getGridData = (mode) => {
-    mode != "dataInObject"
-      ? getDataFromCollection(collection, dependentFilter).then((docs) => {
-          setRows(docs);
-        })
-      : getDocFromCollectionById(collection, dependentFilter[0].id).then(
+  const getGridData = () => {
+    switch (mode) {
+      case "dataInObject":
+        getDocFromCollectionById(collection, dependentFilter[0].id).then(
           (res) => {
             if (res.length != 0) {
               res.variants != undefined && setRows(res.variants);
             }
           }
         );
+
+        return;
+      case "externalData":
+        setRows(extRows);
+        return;
+      default:
+        getDataFromCollection(collection, dependentFilter).then((docs) => {
+          setRows(docs);
+        });
+    }
   };
 
   return {
@@ -92,5 +142,7 @@ export const useDatagrid = ({
     RowUpdate,
     captureFilterIds,
     getGridData,
+    addTest,
+    copyrow,
   };
 };

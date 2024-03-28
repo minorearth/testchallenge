@@ -1,13 +1,14 @@
 export const classes = {
   showhidetool: {
-    delete: false,
-    copy: "none",
-    edittask: "none",
-    edittest: "none",
-    csvload: false,
-    add: false,
-    move: "none",
-    openTestSelected:"none"
+    delete: true,
+    copy: false,
+    edittask: false,
+    edittest: false,
+    csvload: true,
+    add: true,
+    move: false,
+    openTestSelected: false,
+    saveTest: false,
   },
 
   columns: [
@@ -27,13 +28,14 @@ export const classes = {
 export const users = {
   showhidetool: {
     delete: true,
-    copy: "none",
-    edittask: "none",
-    edittest: "none",
+    copy: false,
+    edittask: false,
+    edittest: false,
     csvload: false,
     add: false,
-    move: "none",
-    openTestSelected:"none"
+    move: false,
+    openTestSelected: false,
+    saveTest: false,
   },
 
   columns: [
@@ -48,14 +50,15 @@ export const users = {
 
 export const tasks = {
   showhidetool: {
-    delete: "none",
+    delete: false,
     copy: true,
     edittask: true,
-    edittest: "none",
-    csvload: "none",
-    add: "none",
+    edittest: false,
+    csvload: false,
+    add: false,
     move: true,
-    openTestSelected:true
+    openTestSelected: true,
+    saveTest: false,
   },
 
   columns: [
@@ -72,40 +75,68 @@ export const tasks = {
   ],
 };
 
-export const tests = {
+export const createTest = {
   showhidetool: {
-    delete: false,
-    copy: "none",
-    edittask: "none",
-    edittest: true,
-    csvload: "none",
+    delete: true,
+    copy: false,
+    edittask: false,
+    edittest: false,
+    csvload: false,
     add: false,
-    move: "none",
-    openTestSelected:"none"
+    move: false,
+    openTestSelected: false,
+    saveTest: true,
   },
 
   columns: [
     { field: "id", headerName: "id", width: 270 },
-    {
-      field: "testname",
-      headerName: "Название",
-      editable: true,
-      width: 130,
-    },
-    { field: "tasks", headerName: "Задачи", editable: true, width: 130 },
-    { field: "groups", headerName: "Группы задач", editable: true, width: 130 },
+    // {
+    //   field: "testname",
+    //   headerName: "Название",
+    //   editable: true,
+    //   width: 130,
+    // },
+    { field: "taskname", headerName: "Задача", editable: false, width: 230 },
+    { field: "folder", headerName: "Папка", editable: false, width: 230 },
+    { field: "type", headerName: "Тип", editable: false, width: 130 },
+    { field: "tasks", headerName: "Задачи", editable: false, width: 130 },
+    { field: "allocation", headerName: "Выборка", editable: false, width: 130 },
+    
+    { field: "qty", headerName: "Количество", editable: true, width: 130 },
+  ],
+};
+
+export const tests = {
+  showhidetool: {
+    delete: false,
+    copy: false,
+    edittask: false,
+    edittest: true,
+    csvload: false,
+    add: false,
+    move: false,
+    openTestSelected: false,
+    saveTest: false,
+  },
+
+  columns: [
+    { field: "id", headerName: "id", width: 70 },
+    { field: "name", headerName: "Название", editable: true, width: 270 },
+    { field: "content", headerName: "Контент", editable: true, width: 270 },
+    
   ],
 };
 
 export const variants = {
   showhidetool: {
     delete: true,
-    copy: "none",
-    edittask: "none",
-    edittest: "none",
+    copy: false,
+    edittask: false,
+    edittest: false,
     csvload: false,
     add: false,
-    move: "none",
-    openTestSelected:"none"
+    move: false,
+    openTestSelected: false,
+    saveTest: false,
   },
 };

@@ -11,7 +11,7 @@ export const InvisibleInput = ({ handleFileChange, vis }) => {
     <>
       <Button
         color="primary"
-        sx={{ display: vis }}
+        sx={{ display: !vis&&"none" }}
         startIcon={<FileDownloadOutlinedIcon />}
         onClick={() => fileUpload.current.click()}
       >

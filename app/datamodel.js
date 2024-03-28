@@ -12,6 +12,8 @@ import {
   getDoc,
   updateDoc,
   writeBatch,
+  getAll,
+  initializeFirestore
 } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -26,16 +28,20 @@ const firebaseConfig = {
 
 import { initializeApp } from "firebase/app";
 
-export const app = initializeApp(firebaseConfig);
+export const app = initializeApp(firebaseConfig,);
+// const auth = getAuth(app);
+const db = initializeFirestore(app, {
+  experimentalForceLongPolling: true,
+  useFetchStreams: false,
+});
 
-const db = getFirestore(app);
+// const db = getFirestore(app);
 
 // export const getDataFromCollection = async (
 //   collectionName,
 //   setRows,
 //   dependentFilter
 // ) => {
-//   console.log("sdsd", dependentFilter, dependentFilter.length);
 //   if (dependentFilter.length == 0) {
 //     setRows([]);
 //     return;
@@ -60,16 +66,16 @@ const db = getFirestore(app);
 //   setRows(ret);
 // };
 
-const DBDocsToObject=(docs)=>{
+const DBDocsToObject = (docs) => {
   let ret = [];
-      docs.forEach((item) => {
-        {
-          const data = item.data();
-          ret = [...ret, { id: item.id, ...data }];
-        }
-      });
-  return ret
+  docs.forEach((item) => {
+    {
+      const data = item.data();
+      ret = [...ret, { id: item.id, ...data }];
     }
+  });
+  return ret;
+};
 
 export const getDataFromCollection = async (
   collectionName,
@@ -87,7 +93,6 @@ export const getDataFromCollection = async (
     q = query(col);
   }
   return DBDocsToObject(await getDocs(q));
-  
 };
 
 export const getDocFromCollectionById = async (collectionName, id) => {
@@ -131,7 +136,6 @@ export const deleteAllDocsInCollectionByIds = async (collectionName, ids) => {
 };
 
 const checkIfExistByFieldValue = async (collectionName, key, value) => {
-  console.log("sdsd", collectionName, key, value);
   const collectionRef = collection(db, collectionName);
   const q = query(collectionRef, where(key, "==", value));
   const querySnapshot = await getDocs(q);
@@ -158,7 +162,7 @@ export const addMultipledDocsInCollectionByValue = async (
       return addDoc(collectionRef, item);
     }
   });
-  await  Promise.allSettled(zu);
+  await Promise.allSettled(zu);
 };
 
 export const addDocInCollectionByValue = async (
@@ -177,8 +181,22 @@ export const addDocInCollectionByValue = async (
   check && (await addDoc(collectionRef, data));
 };
 
-export const addDocInCollection = async (collectionName, data, setRows) => {
+export const addDocInCollection = async (collectionName, data) => {
   return await addDoc(collection(db, collectionName), data);
+};
+
+export const copyDocInCollection = async (collectionName, ids) => {
+  // console.log(ids);
+
+  const zu=ids.map((item) => {
+    return getDoc(doc(db, collectionName, item)).then((res) => {
+      const data = res.data();
+      return addDoc(collection(db, collectionName), data);
+    });
+    // return { id: docSnap.id, ...data };
+  });
+
+  await  Promise.allSettled(zu);
 };
 
 export const updateMultipleDocInCollectionById = async (

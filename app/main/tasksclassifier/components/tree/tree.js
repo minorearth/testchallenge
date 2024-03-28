@@ -2,8 +2,12 @@ import React from "react";
 
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import IconButton from "@mui/material/IconButton";
 import { TreeView } from "@mui/x-tree-view/TreeView";
 import { TreeItem } from "@mui/x-tree-view/TreeItem";
+import SendIcon from "@mui/icons-material/Send";
+import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
+import KeyboardDoubleArrowLeftOutlinedIcon from '@mui/icons-material/KeyboardDoubleArrowLeftOutlined';
 
 import { styled, useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -12,49 +16,7 @@ import Button from "@mui/material/Button";
 
 import { treeItemClasses } from "@mui/x-tree-view/TreeItem";
 import MailIcon from "@mui/icons-material/Mail";
-
-const data = {
-  id: "root",
-  name: "Информатика",
-  children: [
-    {
-      id: "0",
-      name: "Не классиффицированные",
-    },
-    {
-      id: "1",
-      name: "Логика",
-    },
-    {
-      id: "2",
-      name: "Теория информации",
-      children: [
-        {
-          id: "21",
-          name: "Кодирование изображений",
-        },
-        {
-          id: "22",
-          name: "Кодирование звука",
-        },
-      ],
-    },
-    {
-      id: "3",
-      name: "Теория алгоритмов",
-      children: [
-        {
-          id: "31",
-          name: "Динамическое программирование",
-        },
-        {
-          id: "32",
-          name: "Рекурсия",
-        },
-      ],
-    },
-  ],
-};
+import { data } from "./treesettings";
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   color: theme.palette.text.secondary,
@@ -89,6 +51,7 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
 
 const StyledTreeItem = React.forwardRef(function StyledTreeItem(props, ref) {
   const theme = useTheme();
+
   const {
     bgColor,
     color,
@@ -99,6 +62,8 @@ const StyledTreeItem = React.forwardRef(function StyledTreeItem(props, ref) {
     bgColorForDarkMode,
     hasChildren,
     setPickedForTest,
+    mode,
+    actions,
     ...other
   } = props;
 
@@ -110,11 +75,6 @@ const StyledTreeItem = React.forwardRef(function StyledTreeItem(props, ref) {
     marginLeft: "15px",
   };
 
-  const handleClick = (e) => {
-    
-    setPickedForTest('value')
-    e.stopPropagation()
-  };
 
   return (
     <StyledTreeItemRoot
@@ -127,9 +87,9 @@ const StyledTreeItem = React.forwardRef(function StyledTreeItem(props, ref) {
             pr: 0,
           }}
         >
-          {hasChildren && (
-            <Box component={LabelIcon} color="inherit" sx={{ mr: 1 }} />
-          )}
+          {/* {hasChildren && ( */}
+          <Box component={LabelIcon} color="inherit" sx={{ mr: 1 }} />
+          {/* )} */}
           <Typography
             variant="body2"
             sx={{ fontWeight: "inherit", flexGrow: 1 }}
@@ -139,7 +99,22 @@ const StyledTreeItem = React.forwardRef(function StyledTreeItem(props, ref) {
           <Typography variant="caption" color="inherit">
             {labelInfo}
           </Typography>
-          <Button onClick={(e) => handleClick(e,props)}>В тест</Button>
+          {/* <Button >В тест</Button> */}
+          {mode != "move" ? (
+            <IconButton
+              aria-label="Добавить в тест"
+              onClick={(e) => actions.addTotest(e, props)}
+            >
+              <SendIcon />
+            </IconButton>
+          ) : (
+            <IconButton
+              aria-label="Переместить в папку"
+              onClick={(e) => actions.moveTasks(props)}
+            >
+              <KeyboardDoubleArrowLeftOutlinedIcon />
+            </IconButton>
+          )}
         </Box>
       }
       style={styleProps}
@@ -149,43 +124,27 @@ const StyledTreeItem = React.forwardRef(function StyledTreeItem(props, ref) {
   );
 });
 
-export const Tree = ({ setSelected, sx,setPickedForTest }) => {
-  // console.log(setSelected)
-  // 
-
+export const Tree = ({ setSelected, sx, mode,actions }) => {
   const handleNodeSelection = (e, ids) => {
-
     setSelected([{ id: ids }]);
   };
 
-  const handleNodeS = (state) => {
 
-    setPickedForTest(state)
-  };
-
-  // const renderTree = (nodes) => (
-  //   <TreeItem key={nodes.id} nodeId={nodes.id} label={nodes.name} >
-  //     {Array.isArray(nodes.children)
-  //       ? nodes.children.map((node) => renderTree(node))
-  //       : null}
-  //   </TreeItem>
-  // );
-
-  const renderTree = (nodes,setPickedForTest) => {
+  const renderTree = (nodes, mode,actions) => {
     // <StyledTreeItem nodeId="1" labelText="All Mail" labelIcon={MailIcon} />
     const hasChildren = Array.isArray(nodes.children);
-
     return (
       <StyledTreeItem
         key={nodes.id}
         hasChildren={hasChildren}
         nodeId={nodes.id}
         labelText={nodes.name}
-        labelIcon={MailIcon}
-        setPickedForTest={handleNodeS}
+        labelIcon={FolderOutlinedIcon}
+        actions={actions}
+        mode={mode}
       >
         {Array.isArray(nodes.children)
-          ? nodes.children.map((node) => renderTree(node))
+          ? nodes.children.map((node) => renderTree(node,mode,actions))
           : null}
       </StyledTreeItem>
     );
@@ -200,7 +159,7 @@ export const Tree = ({ setSelected, sx,setPickedForTest }) => {
       defaultExpandIcon={<ChevronRightIcon />}
       onNodeSelect={(e, ids) => handleNodeSelection(e, ids)}
     >
-      {renderTree(data,setPickedForTest)}
+      {renderTree(data, mode,actions)}
     </TreeView>
   );
 };

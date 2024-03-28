@@ -2,7 +2,7 @@ import React from "react";
 import Box from "@mui/material/Box";
 import { Datagrid } from "../../components/datagrid/datagrid";
 import { useState } from "react";
-import { Tree } from "./tree";
+import { Tree } from "./tree/tree";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import Fab from "@mui/material/Fab";
@@ -12,8 +12,9 @@ import { SwipeableEdgeDrawer } from "./swipeDrawer";
 import { updateMultipleDocInCollectionById } from "../../../datamodel";
 import Button from "@mui/material/Button";
 import { ModalTS } from "../../components/modal/modal";
-import {GmailTreeView} from './custTree'
-
+import { allocateTasks, neverRepeat } from "../components/tree/treeutils";
+import { getDataFromCollection } from "../../../datamodel";
+import { data } from "../components/tree/treesettings";
 
 export const Classifier = () => {
   const collection = "tasks2";
@@ -24,9 +25,55 @@ export const Classifier = () => {
   const [selectedTasks, setSelectedTasks] = useState([]);
   const handleModalOpen = () => setOpenMoveModal(true);
 
-  const moveTasks = (selectedFolderToMove) => {
+
+
+      // // //Найти все  айдишники  лисьтев узла
+      // const TaskNum = 10;
+      // const idsTaskNum = allocateTasks(data, nodeId, TaskNum);
+      // const filters = Object.keys(idsTaskNum).map((item) => ({ id: item }));
+      // //Запросить по этим  айдишникам задачи
+      // getDataFromCollection("tasks2", filters).then((res) => {
+      //   Object.keys(idsTaskNum).forEach((fldid) => {
+      //     console.log(pickRandomTasks(
+      //       idsTaskNum[fldid],
+      //       res.filter((item) => item.extid == fldid).map((item) => item.id)
+      //     ));
+      //   });
+  
+      // });
+
+  const addTotest = (e, { nodeId, labelText }) => {
+    // //Найти все  айдишники  лисьтев узла
+    const TaskNum = 10;
+    const idsTaskNum = allocateTasks(data, nodeId, TaskNum);
+    const filters = Object.keys(idsTaskNum).map((item) => ({ id: item }));
+    // //Запросить по этим  айдишникам задачи
+    getDataFromCollection("tasks2", filters).then((res) => {
+
+      setPickedForTest((state) => [
+        ...state,
+        {
+          type: "folder",
+          id: nodeId,
+          folder: labelText,
+          tasks:res,
+          allocation:idsTaskNum,
+          qty: "Укажите количество задач",
+        },
+      ]);
+      
+
+    });
+
+
+
+    e.stopPropagation();
+  };
+
+  const moveTasks = ({ nodeId }) => {
+    // console.log('zu',selectedFolderToMove)
     updateMultipleDocInCollectionById(collection, selectedTasks, {
-      extid: selectedFolderToMove[0].id,
+      extid: nodeId,
     });
     setOpenMoveModal(false);
   };
@@ -54,7 +101,13 @@ export const Classifier = () => {
       }}
     >
       {/* <HorizontalLinearStepper /> */}
-      <Tree setSelected={setSelectedFolder} sx={{ flexGrow: 1 }} setPickedForTest={setPickedForTest} />
+      <Tree
+        setSelected={setSelectedFolder}
+        sx={{ flexGrow: 1 }}
+        setPickedForTest={setPickedForTest}
+        mode="select"
+        actions={{ moveTasks: moveTasks, addTotest: addTotest }}
+      />
       <Datagrid
         sx={{ flexGrow: 6 }}
         collection={collection}
@@ -63,21 +116,47 @@ export const Classifier = () => {
         checkduplic={false}
         dependentFilter={selectedFolder}
         setFilters={setSelectedTasks}
-        actions={{ movetask: handleModalOpen, openTestSelected: ()=>setOpenTestModal(true) }}
+        actions={{
+          movetask: handleModalOpen,
+          openTestSelected: () => setOpenTestModal(true),
+          setPickedForTest: setPickedForTest,
+        }}
       />
       {/* <SwipeableEdgeDrawer state={state} toggleDrawer={toggleDrawer} /> */}
-      <ModalTS open={openMoveModal} close={() => setOpenMoveModal(false)  } sx={{height:"40%", width:'40%'}}> 
+      <ModalTS
+        open={openMoveModal}
+        close={() => setOpenMoveModal(false)}
+        sx={{ height: "40%", width: "40%" }}
+      >
         <Typography id="modal-modal-title" variant="h6" component="h2">
           Выберите новое местоположение
         </Typography>
-        <Tree setSelected={moveTasks} />
+        <Tree
+          setSelected={() => {}}
+          mode="move"
+          actions={{ moveTasks: moveTasks, addTotest: addTotest }}
+        />
       </ModalTS>
-      <ModalTS open={openTestModal} close={() => setOpenTestModal(false)  } sx={{height:"90%", width:'90%'}}> 
+
+      <ModalTS
+        open={openTestModal}
+        close={() => setOpenTestModal(false)}
+        sx={{ height: "90%", width: "90%" }}
+      >
         <Typography id="modal-modal-title" variant="h6" component="h2">
-          Выберите новое местоположение2
+          Задачи и папки в тесте
         </Typography>
-        <GmailTreeView/>
-    
+        <Datagrid
+          collection="tests"
+          mode="externalData"
+          extRows={pickedForTest}
+          extRowsSetter={setPickedForTest}
+          keyfield="none"
+          checkduplic={false}
+          dependentFilter=""
+          setFilters={() => {}}
+          actions={{ action1: () => {}, action1: () => {} }}
+        />
       </ModalTS>
 
       {/* <Fab

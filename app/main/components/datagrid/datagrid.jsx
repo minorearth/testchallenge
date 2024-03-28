@@ -3,6 +3,7 @@ import { DataGrid, GridToolbarContainer } from "@mui/x-data-grid";
 import { useEffect, useState, useRef } from "react";
 import { Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined";
 import DriveFileMoveOutlinedIcon from "@mui/icons-material/DriveFileMoveOutlined";
 import CreateOutlinedIcon from "@mui/icons-material/CreateOutlined";
@@ -16,8 +17,17 @@ import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import { GridActionsCellItem } from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import { tasks, classes, users, variants, tests } from "./dgsettings";
+import {
+  tasks,
+  classes,
+  users,
+  variants,
+  tests,
+  createTest,
+} from "./dgsettings";
 import { ModalTS } from "../modal/modal";
+
+import SendIcon from "@mui/icons-material/Send";
 
 // { delete, copy, edittask, csvload, add, move}
 function EditToolbar({
@@ -25,7 +35,9 @@ function EditToolbar({
   uploadDataFromCss,
   deleteRows,
   showhidetool,
+  addTest,
   actions,
+  copyrow,
 }) {
   return (
     <GridToolbarContainer>
@@ -37,14 +49,14 @@ function EditToolbar({
         color="primary"
         startIcon={<DeleteOutlineOutlinedIcon />}
         onClick={() => deleteRows()}
-        sx={{ display: showhidetool.delete }}
+        sx={{ display: !showhidetool.delete && "none" }}
       >
         Удалить выбранные
       </Button>
       <Button
         color="primary"
         startIcon={<AddIcon />}
-        sx={{ display: showhidetool.add }}
+        sx={{ display: !showhidetool.add && "none" }}
         onClick={addrow}
       >
         Добавить
@@ -52,7 +64,7 @@ function EditToolbar({
       <Button
         color="primary"
         startIcon={<CreateOutlinedIcon />}
-        sx={{ display: showhidetool.edittask }}
+        sx={{ display: !showhidetool.edittask && "none" }}
         onClick={addrow}
       >
         Отредактировать задачу
@@ -60,7 +72,7 @@ function EditToolbar({
       <Button
         color="primary"
         startIcon={<CreateOutlinedIcon />}
-        sx={{ display: showhidetool.edittest }}
+        sx={{ display: !showhidetool.edittest && "none" }}
         onClick={addrow}
       >
         Отредактировать тест
@@ -68,7 +80,7 @@ function EditToolbar({
       <Button
         color="primary"
         startIcon={<DriveFileMoveOutlinedIcon />}
-        sx={{ display: showhidetool.move }}
+        sx={{ display: !showhidetool.move && "none" }}
         onClick={() => actions.movetask()}
       >
         Переместить
@@ -76,18 +88,26 @@ function EditToolbar({
       <Button
         color="primary"
         startIcon={<ContentCopyOutlinedIcon />}
-        sx={{ display: showhidetool.copy }}
-        onClick={addrow}
+        sx={{ display: !showhidetool.openTestSelected && "none" }}
+        onClick={() => actions.openTestSelected()}
       >
-        Скопировать
+        Создать тест
+      </Button>
+      <Button
+        color="primary"
+        startIcon={<SaveOutlinedIcon />}
+        sx={{ display: !showhidetool.saveTest && "none" }}
+        onClick={() => addTest()}
+      >
+        Сохранить тест
       </Button>
       <Button
         color="primary"
         startIcon={<ContentCopyOutlinedIcon />}
-        sx={{ display: showhidetool.openTestSelected }}
-        onClick={()=>actions.openTestSelected()}
+        sx={{ display: !showhidetool.copy && "none" }}
+        onClick={() => copyrow()}
       >
-        Создать тест
+        Копировать
       </Button>
     </GridToolbarContainer>
   );
@@ -102,6 +122,7 @@ export function Datagrid(props) {
     collection,
     setFilters,
     sx,
+    extRows,
   } = props;
 
   const [loaded, setLoaded] = useState(true);
@@ -120,6 +141,8 @@ export function Datagrid(props) {
     RowUpdate,
     captureFilterIds,
     getGridData,
+    addTest,
+    copyrow,
   } = useDatagrid({
     ...props,
     selectedRows: selectedRows,
@@ -147,6 +170,13 @@ export function Datagrid(props) {
     setSelectedRows(ids);
   };
 
+  const handlePickedForTest = ({ id, row }) => {
+    actions.setPickedForTest((state) => [
+      ...state,
+      { type: "task", id: id, taskname: row.description, qty: "1" },
+    ]);
+  };
+
   const router = useRouter();
   const handleEditClick = (id) => {
     router.push(`/main/tasksclassifier/${id}`);
@@ -154,11 +184,11 @@ export function Datagrid(props) {
 
   useEffect(() => {
     getGridData(mode);
-  }, [dependentFilter, loaded]);
+  }, [dependentFilter, loaded, extRows]);
 
   useEffect(() => {
-    getGridData(mode);
-    setCols(columns);
+    getGridData();
+    // setCols(columns);
     switch (collection + mode) {
       case "tasks2simple":
         setShowhidetool(tasks.showhidetool);
@@ -177,6 +207,11 @@ export function Datagrid(props) {
                 label="View"
                 icon={<VisibilityOutlinedIcon />}
                 onClick={() => handleViewClick(params)}
+              />,
+              <GridActionsCellItem
+                label="View"
+                icon={<SendIcon />}
+                onClick={() => handlePickedForTest(params)}
               />,
             ],
           },
@@ -197,6 +232,10 @@ export function Datagrid(props) {
       case "testssimple":
         setShowhidetool(tests.showhidetool);
         setCols(tests.columns);
+        break;
+      case "testsexternalData":
+        setShowhidetool(createTest.showhidetool);
+        setCols(createTest.columns);
         break;
       default:
         console.log("Странно", columns);
@@ -227,7 +266,9 @@ export function Datagrid(props) {
             addrow,
             deleteRows,
             showhidetool,
+            addTest,
             actions,
+            copyrow,
           },
         }}
         initialState={{
@@ -246,13 +287,12 @@ export function Datagrid(props) {
       <ModalTS
         open={openViewModal}
         close={() => setOpenViewModal(false)}
-        sx={{ height: "30%", width: "30%" }} >
-          <Typography id="modal-modal-title" component="h2">
-            {modaltext}
-          </Typography>
+        sx={{ height: "30%", width: "30%" }}
+      >
+        <Typography id="modal-modal-title" component="h2">
+          {modaltext}
+        </Typography>
       </ModalTS>
-
-  
     </React.Fragment>
   );
 }
